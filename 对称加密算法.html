@@ -1,0 +1,601 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>对称加密算法 - 信息安全</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="前言.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded affix "><li class="part-title">密码学</li><li class="chapter-item expanded "><a href="密码学发展史.html"><strong aria-hidden="true">2.</strong> 密码学发展史</a></li><li class="chapter-item expanded "><a href="可读性算法.html"><strong aria-hidden="true">3.</strong> 可读性算法</a></li><li class="chapter-item expanded "><a href="对称加密算法.html" class="active"><strong aria-hidden="true">4.</strong> 对称加密算法</a></li><li class="chapter-item expanded "><a href="消息摘要算法.html"><strong aria-hidden="true">5.</strong> 消息摘要算法</a></li><li class="chapter-item expanded "><a href="非对称加密算法.html"><strong aria-hidden="true">6.</strong> 非对称加密算法</a></li><li class="chapter-item expanded "><a href="数字签名和数字证书.html"><strong aria-hidden="true">7.</strong> 数字签名和数字证书</a></li><li class="chapter-item expanded "><a href="隐写术.html"><strong aria-hidden="true">8.</strong> 隐写术</a></li><li class="chapter-item expanded affix "><li class="part-title">区块链</li><li class="chapter-item expanded affix "><li class="part-title">Solidity</li><li class="chapter-item expanded affix "><li class="part-title">Toolkit</li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">信息安全</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="对称加密算法"><a class="header" href="#对称加密算法">对称加密算法</a></h1>
+<ul>
+<li><a href="#%E7%AE%80%E4%BB%8B">简介</a></li>
+<li><a href="#des">DES</a>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+<li><a href="#java%E8%B0%83%E7%94%A8desecbpkcs5padding">Java调用（DES/ECB/PKCS5Padding）</a></li>
+<li><a href="#python%E8%B0%83%E7%94%A8">Python调用</a></li>
+</ul>
+</li>
+<li><a href="#aes">AES</a>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86-1">原理</a></li>
+<li><a href="#java%E5%AE%9E%E7%8E%B0aesecbpkcs5padding">Java实现（AES/ECB/PKCS5Padding）</a></li>
+<li><a href="#python%E5%AE%9E%E7%8E%B0">Python实现</a></li>
+</ul>
+</li>
+<li><a href="#%E5%8A%A0%E5%AF%86%E6%96%B9%E5%BC%8F">加密方式</a>
+<ul>
+<li><a href="#ecbelectronic-codebook">ECB(Electronic codebook)</a></li>
+<li><a href="#cbccipher-block-chaining">CBC(Cipher-block chaining)</a></li>
+</ul>
+</li>
+<li><a href="#%E5%A1%AB%E5%85%85%E6%A8%A1%E5%BC%8F">填充模式</a>
+<ul>
+<li><a href="#nopadding">NoPadding</a></li>
+<li><a href="#pkcs5padding">PKCS5Padding</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="简介"><a class="header" href="#简介">简介</a></h2>
+<p>默认情况下加密模式和填充模式为ECB/PKCS5Padding</p>
+<p>使用CBC加密方式，加密、解密都需要创建IV向量。IV向量的长度也必须是特定长度的整数倍。</p>
+<p>特点</p>
+<ul>
+<li>加密速度快, 可以加密大文件</li>
+<li>密文可逆, 一旦密钥文件泄漏, 就会导致数据暴露</li>
+<li>加密后编码表找不到对应字符, 出现乱码</li>
+<li>一般结合Base64使用，解决乱码的问题</li>
+</ul>
+<h2 id="des"><a class="header" href="#des">DES</a></h2>
+<p>DES : Data Encryption Standard，即数据加密标准，是一种使用密钥加密的块算法，1977年被美国联邦政府的国家标准局确定为联邦资料处理标准（FIPS），并授权在非密级政府通信中使用，随后该算法在国际上广泛流传开来。</p>
+<p>密钥key必须是8位</p>
+<h3 id="原理"><a class="header" href="#原理">原理</a></h3>
+<p>DES（Data Encryption Standard）是一种对称加密算法，其原理基于置换和替代。下面是DES加密算法的工作原理：</p>
+<ol>
+<li>
+<p><strong>密钥生成</strong>：DES算法使用固定长度的密钥（56位）进行加密和解密。首先，根据用户提供的密钥，生成16个子密钥，每个子密钥48位长。</p>
+</li>
+<li>
+<p><strong>初始置换（Initial Permutation）</strong>：明文经过一个固定的初始置换IP（Initial Permutation）置换后得到一个64位的数据块。</p>
+</li>
+<li>
+<p><strong>轮函数（Round Function）</strong>：DES算法使用16轮替换-置换网络（Feistel Network）来加密数据。每一轮中，明文的左半部分和右半部分会分别经过一系列的替代和置换操作，并且会使用不同的子密钥。</p>
+</li>
+<li>
+<p><strong>替代操作（Substitution）</strong>：在DES算法中，会使用S盒进行替代操作。S盒是一个4x16的矩阵，将6位输入映射为4位输出。DES算法共有8个不同的S盒。</p>
+</li>
+<li>
+<p><strong>置换操作（Permutation）</strong>：DES算法中还会进行置换操作，将数据重新排列以增加其随机性。</p>
+</li>
+<li>
+<p><strong>逆初始置换（Final Permutation）</strong>：经过16轮的替换和置换操作后，得到的加密结果会经过逆初始置换IP^-1，将64位数据块重新排列并输出。</p>
+</li>
+<li>
+<p><strong>密文输出</strong>：经过逆初始置换后得到的密文即为加密结果。</p>
+</li>
+</ol>
+<p>总的来说，DES算法通过多轮的替换和置换操作来加密数据，并且通过密钥生成子密钥来增加加密的随机性。虽然DES算法曾经是比较安全的加密算法，但由于密钥长度较短，目前已经不适合用于加密敏感数据，因此已经被更高级的加密算法如AES所取代。</p>
+<h3 id="java调用desecbpkcs5padding"><a class="header" href="#java调用desecbpkcs5padding">Java调用（DES/ECB/PKCS5Padding）</a></h3>
+<pre><code class="language-java">package code;
+
+import java.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+public class DESDemo {
+    // DES加密算法,key的大小必须是8个字节
+
+    public static void main(String[] args) throws Exception {
+        String input = "硅谷";
+        // DES加密算法，比较高级，所以key的大小必须是8个字节
+        String key = "12345678";
+
+        String transformation = "DES/ECB/PKCS5Padding"; // 加密算法/加密模式/填充方式
+        // 指定获取密钥的算法
+        String algorithm = "DES";
+        // 先测试加密，然后在测试解密
+        String encryptDES = encryptDES(input, key, transformation, algorithm);
+        System.out.println("加密:" + encryptDES);
+        String s = decryptDES(encryptDES, key, transformation, algorithm);
+        System.out.println("解密:" + s);
+
+    }
+
+    /**
+     * 使用DES加密数据
+     *
+     * @param input          : 原文
+     * @param key            : 密钥(DES, 密钥的长度必须是16个字节)
+     * @param transformation : 获取Cipher对象的算法
+     * @param algorithm      : 获取密钥的算法
+     * @return : 密文
+     * @throws Exception
+     */
+    private static String encryptDES(String input, String key, String transformation, String algorithm) throws Exception {
+        // 获取加密对象
+        Cipher cipher = Cipher.getInstance(transformation);
+        // 创建加密规则
+        SecretKeySpec sks = new SecretKeySpec(key.getBytes(), algorithm);
+        // ENCRYPT_MODE：加密模式
+        // DECRYPT_MODE: 解密模式
+        // 初始化加密模式和算法
+        cipher.init(Cipher.ENCRYPT_MODE, sks);
+        // 加密
+        byte[] bytes = cipher.doFinal(input.getBytes());
+
+        // 输出加密后的数据
+
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * 使用DES解密
+     *
+     * @param input          : 密文
+     * @param key            : 密钥
+     * @param transformation : 获取Cipher对象的算法
+     * @param algorithm      : 获取密钥的算法
+     * @return: 原文
+     * @throws Exception
+     */
+    private static String decryptDES(String input, String key, String transformation, String algorithm) throws Exception {
+        // 获取Cipher对象
+        Cipher cipher = Cipher.getInstance(transformation);
+        // 指定密钥规则
+        SecretKeySpec sks = new SecretKeySpec(key.getBytes(), algorithm);
+        cipher.init(Cipher.DECRYPT_MODE, sks);
+        // 解密
+        byte[] bytes = cipher.doFinal(Base64.getDecoder().decode(input));
+
+        return new String(bytes);
+    }
+}
+</code></pre>
+<p>输出结果如下：</p>
+<pre><code>加密:qANksk5lvqM=
+解密:硅谷
+</code></pre>
+<h3 id="python调用"><a class="header" href="#python调用">Python调用</a></h3>
+<p>在Python中使用DES加密可以使用<code>pycryptodome</code>库。以下是一个用DES算法加密字符串“打倒老大哥”并进行解密的示例代码：</p>
+<pre><code class="language-python">from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+import base64
+
+def encrypt_text(text):
+    key = b'abcdefgh'  # DES密钥必须是8个字节
+    cipher = DES.new(key, DES.MODE_ECB)
+    padded_data = text.ljust(8 * (len(text) // 8 + 1), ' ')  # 补齐数据长度为8的倍数
+    ciphertext = cipher.encrypt(padded_data.encode('utf-8'))
+    encrypted_text = base64.b64encode(ciphertext).decode('utf-8')
+    return encrypted_text
+
+def decrypt_text(encrypted_text):
+    key = b'abcdefgh'  # DES密钥必须是8个字节
+    cipher = DES.new(key, DES.MODE_ECB)
+    ciphertext = base64.b64decode(encrypted_text.encode('utf-8'))
+    decrypted_data = cipher.decrypt(ciphertext).decode('utf-8').strip()
+    return decrypted_data
+
+text = "打倒老大哥"
+encrypted_text = encrypt_text(text)
+print("加密后的字符串:", encrypted_text)
+
+decrypted_text = decrypt_text(encrypted_text)
+print("解密后的字符串:", decrypted_text)
+</code></pre>
+<p>在这个示例代码中，我们使用了DES算法，并指定了ECB模式。首先定义了DES加密的密钥<code>key</code>，并创建一个DES加密对象<code>cipher</code>。然后对要加密的明文补齐至8的倍数长度，使用密钥对明文进行加密，再将加密后的密文进行Base64编码以便于输出。</p>
+<p>运行以上代码，将会先输出加密后的密文，然后再输出解密后的原始明文，即可完成先加密后解密的过程。请注意，在实际应用中，需要注意密文传输的安全性和确保密钥只有合法的用户能够访问。</p>
+<h2 id="aes"><a class="header" href="#aes">AES</a></h2>
+<p>AES : Advanced Encryption Standard, 高级加密标准 .在密码学中又称Rijndael加密法，是美国联邦政府采用的一种区块加密标准。这个标准用来替代原先的DES，已经被多方分析且广为全世界所使用。</p>
+<p>密钥key必须是16位</p>
+<h3 id="原理-1"><a class="header" href="#原理-1">原理</a></h3>
+<p>AES（Advanced Encryption Standard）是一种对称加密算法，其原理基于替代和置换。下面是AES加密算法的工作原理：</p>
+<ol>
+<li>
+<p><strong>密钥扩展（Key Expansion）</strong>：AES算法使用固定长度的密钥（128位、192位或256位）来进行加密和解密。在加密和解密过程中，需要生成轮密钥（Round Key）。轮密钥是从初始密钥生成的一系列密钥，每一轮加密或解密过程都使用不同的轮密钥。密钥扩展算法根据初始密钥生成足够的轮密钥。</p>
+</li>
+<li>
+<p><strong>初始轮（Initial Round）</strong>：AES算法首先使用初始轮密钥对明文进行初始处理。初始轮包括字节替换（SubBytes）、行移位（ShiftRows）、列混淆（MixColumns）和轮密钥加（AddRoundKey）。</p>
+</li>
+<li>
+<p><strong>多轮加密（Rounds）</strong>：AES算法使用多轮加密来保障数据安全。每一轮加密包括字节替换、行移位、列混淆和轮密钥加这四个步骤。加密轮数取决于密钥长度，128位密钥需要10轮，192位密钥需要12轮，256位密钥需要14轮。</p>
+</li>
+<li>
+<p><strong>最终轮（Final Round）</strong>：在最后一轮加密中，不执行列混淆步骤。最后一轮只包括字节替换、行移位和轮密钥加这三个步骤。</p>
+</li>
+<li>
+<p><strong>密文输出（Cipher Text）</strong>：经过多轮加密后，明文被转换成密文。最后输出的密文即为加密结果。</p>
+</li>
+</ol>
+<p>总的来说，AES算法是通过多轮的替代和置换操作来保证数据的安全性。密钥长度的不同会导致加密的轮数、轮密钥数量的不同，从而增加了加密的强度和安全性。AES算法是目前最为常用和安全的加密算法之一。</p>
+<h3 id="java实现aesecbpkcs5padding"><a class="header" href="#java实现aesecbpkcs5padding">Java实现（AES/ECB/PKCS5Padding）</a></h3>
+<pre><code class="language-java">package code;
+
+import java.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+
+public class AESDemo {
+
+    public static void main(String[] args) throws Exception {
+        String input = "硅谷";
+        // AES加密算法，比较高级，所以key的大小必须是16个字节
+        String key = "1234567812345678";
+
+        String transformation = "AES/ECB/PKCS5Padding"; // 加密算法/加密模式/填充方式
+        // 指定获取密钥的算法
+        String algorithm = "AES";
+        // 先测试加密，然后在测试解密
+        String encryptAES = encryptAES(input, key, transformation, algorithm);
+        System.out.println("加密:" + encryptAES);
+        String s = decryptAES(encryptAES, key, transformation, algorithm);
+        System.out.println("解密:" + s);
+
+    }
+
+    /**
+     * 使用AES加密数据
+     *
+     * @param input          : 原文
+     * @param key            : 密钥(AES, 密钥的长度必须是16个字节)
+     * @param transformation : 获取Cipher对象的算法
+     * @param algorithm      : 获取密钥的算法
+     * @return : 密文
+     * @throws Exception
+     */
+    private static String encryptAES(String input, String key, String transformation, String algorithm) throws Exception {
+        // 获取加密对象
+        Cipher cipher = Cipher.getInstance(transformation);
+        // 创建加密规则
+        SecretKeySpec sks = new SecretKeySpec(key.getBytes(), algorithm);
+        // ENCRYPT_MODE：加密模式
+        // DECRYPT_MODE: 解密模式
+        // 初始化加密模式和算法
+        cipher.init(Cipher.ENCRYPT_MODE, sks);
+        // 加密
+        byte[] bytes = cipher.doFinal(input.getBytes());
+
+        // 输出加密后的数据  
+
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+
+    /**
+     * 使用AES解密
+     *
+     * @param input          : 密文
+     * @param key            : 密钥
+     * @param transformation : 获取Cipher对象的算法
+     * @param algorithm      : 获取密钥的算法
+     * @return: 原文
+     * @throws Exception
+     */
+    private static String decryptAES(String input, String key, String transformation, String algorithm) throws Exception {
+        // 获取Cipher对象
+        Cipher cipher = Cipher.getInstance(transformation);
+        // 指定密钥规则
+        SecretKeySpec sks = new SecretKeySpec(key.getBytes(), algorithm);
+        cipher.init(Cipher.DECRYPT_MODE, sks);
+        // 解密
+        byte[] bytes = cipher.doFinal(Base64.getDecoder().decode(input));
+
+        return new String(bytes);
+    }
+}
+</code></pre>
+<p>输出结果如下：</p>
+<pre><code>加密:LIdHYmgk7CfTDY/pvc/SlQ==
+解密:硅谷
+</code></pre>
+<h3 id="python实现"><a class="header" href="#python实现">Python实现</a></h3>
+<p>在Python中使用AES加密可以通过<code>pycryptodome</code>库来实现。</p>
+<p>要先对字符串进行加密，然后再对加密后的密文进行解密，可以修改上面的代码稍作调整。下面是一个完整的示例代码：</p>
+<pre><code class="language-python">from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+import base64
+
+def encrypt_text(text):
+    key = b'Sixteen byte key'  # AES密钥必须是16个字节（128位）
+    cipher = AES.new(key, AES.MODE_ECB)
+    padded_data = text.ljust(16 * (len(text) // 16 + 1), ' ')  # 补齐数据长度为16的倍数
+    ciphertext = cipher.encrypt(padded_data.encode('utf-8'))
+    encrypted_text = base64.b64encode(ciphertext).decode('utf-8')
+    return encrypted_text
+
+def decrypt_text(encrypted_text):
+    key = b'Sixteen byte key'  # AES密钥必须是16个字节（128位）
+    cipher = AES.new(key, AES.MODE_ECB)
+    ciphertext = base64.b64decode(encrypted_text.encode('utf-8'))
+    decrypted_data = cipher.decrypt(ciphertext).decode('utf-8').strip()
+    return decrypted_data
+
+text = "打倒老大哥"
+encrypted_text = encrypt_text(text)
+print("加密后的字符串:", encrypted_text)
+
+decrypted_text = decrypt_text(encrypted_text)
+print("解密后的字符串:", decrypted_text)
+</code></pre>
+<p>在这个示例代码中，我们添加了一个<code>decrypt_text</code>函数来实现对加密后的密文进行解密。在解密函数中，我们同样需要提供AES加密时使用的密钥，并使用相同的AES对象对密文进行解密操作，最后得到原始的明文。</p>
+<p>运行以上代码，将会先输出加密后的密文，然后再输出解密后的原始明文，即可完成先加密后解密的过程。请注意，在实际应用中，需要注意密文传输的安全性和确保密钥只有合法的用户能够访问。</p>
+<h2 id="加密方式"><a class="header" href="#加密方式">加密方式</a></h2>
+<p>前面DES和AES都有key，而加密模式是说怎么用key。</p>
+<p>ECB是同key并行，CBC是变key串行</p>
+<p>对称加密中的加密模式有很多种，其中比较常见的有 ECB（Electronic Codebook）、CBC（Cipher Block Chaining）、CFB（Cipher Feedback）、OFB（Output Feedback）、CTR（Counter）等。</p>
+<ol>
+<li>ECB（Electronic Codebook）模式：</li>
+</ol>
+<p>ECB 是最简单的加密模式，将明文分成固定大小的块，然后每个块独立加密。虽然简单易实现，但由于每个块独立加密，导致相同明文块会得到相同的密文块，存在明显的安全问题。</p>
+<ol start="2">
+<li>CBC（Cipher Block Chaining）模式：</li>
+</ol>
+<p>CBC 是一种常见的加密模式，是将前一个加密块的密文和当前明文块进行异或操作，再进行加密。每个块的加密依赖于前一个块的密文，避免了 ECB 模式的问题，并提高了安全性。</p>
+<ol start="3">
+<li>CFB（Cipher Feedback）模式：</li>
+</ol>
+<p>CFB 模式将密文作为输入反馈到密码算法中生成密文块，再与明文块异或生成最终的密文。CFB 模式可以将块密码转换为流密码使用，适合于需要实时传输的数据加密。</p>
+<ol start="4">
+<li>OFB（Output Feedback）模式：</li>
+</ol>
+<p>OFB 模式将前一个加密块输出作为输入反馈到密码算法中生成密钥流，再与明文异或得到密文。OFB 模式不依赖于前一个块的密文，因此可以提高并行加密的速度。</p>
+<ol start="5">
+<li>CTR（Counter）模式：</li>
+</ol>
+<p>CTR 模式通过一个计数器和一个初始化向量生成密钥流，再与明文异或得到密文。CTR 模式避免了与前一个块的依赖关系，并可以实现高效的并行加密。</p>
+<p>这些是常见的对称加密模式，每种模式都有自己的特点和适用场景，选择合适的加密模式可以提高数据的安全性和性能。</p>
+<h3 id="ecbelectronic-codebook"><a class="header" href="#ecbelectronic-codebook">ECB(Electronic codebook)</a></h3>
+<p>电子密码本按照密码块的大小把需要加密的消息分为数个块，然后使用同一个key对每个块分别加密。</p>
+<p>优点：可以并行处理数据</p>
+<p>缺点：同样的原文生成同样的密文，不能很好地保护数据</p>
+<p>同时加密，原文一样则密文也一样。</p>
+<h3 id="cbccipher-block-chaining"><a class="header" href="#cbccipher-block-chaining">CBC(Cipher-block chaining)</a></h3>
+<p>密码块链接，每个明文块都与前一个密文块进行异或运算后，再使用同一个key进行加密。在这种方法中，每个密文块都依赖于它前面的所有明文块。</p>
+<p>优点：同样的原文生成的密文不一样</p>
+<p>缺点：串行处理数据，速度较慢</p>
+<h2 id="填充模式"><a class="header" href="#填充模式">填充模式</a></h2>
+<p>对称加密中的填充模式是为了解决明文长度不满足加密算法块大小要求时的处理方式。常见的填充模式有 PKCS#5/PKCS#7 填充、ISO7816-4 填充、Zero 填充和ANSI X.923 填充等。</p>
+<ol>
+<li>PKCS#5/PKCS#7 填充：</li>
+</ol>
+<p>PKCS#5 和 PKCS#7 填充是较为常见的填充模式，它们在加密前将明文填充到加密块的大小，填充内容是填充的字节数。PKCS#5 不允许填充长度为块大小，而 PKCS#7 需要填充块大小的长度。在解密时，根据最后一个字节的填充长度可以准确去除填充。</p>
+<ol start="2">
+<li>ISO7816-4 填充：</li>
+</ol>
+<p>ISO7816-4 填充是一种简单的填充模式，将剩余需要填充的字节数用 0x80 填充，剩余的位置用 0x00 填充。在解密时，找到第一个 0x80 并移除，后面的 0x00 即为填充部分。</p>
+<ol start="3">
+<li>Zero 填充：</li>
+</ol>
+<p>Zero 填充是一种填充模式，将剩余需要填充的字节数用 0x00 填充。在解密时就需要遍历找到非 0 字节，判断是否是填充部分并去除。</p>
+<ol start="4">
+<li>ANSI X.923 填充：</li>
+</ol>
+<p>ANSI X.923 填充是一种填充模式，将剩余需要填充的字节数用 0x00 填充，最后一个字节记录填充的长度。在解密时，根据最后一个字节的填充长度可以准确去除填充。</p>
+<p>以上是常见的对称加密中的填充模式，选择合适的填充模式可以保证数据在加密后正确性和完整性，并避免数据截断的问题。不同的填充模式适用于不同的场景和系统要求，需要根据具体需求选择合适的填充模式。</p>
+<h3 id="nopadding"><a class="header" href="#nopadding">NoPadding</a></h3>
+<p>不填充。</p>
+<p>使用DES加密算法时，要求原文长度必须是8byte的整数倍</p>
+<p>使用AES加密算法时，要求原文长度必须是16byte的整数倍</p>
+<h3 id="pkcs5padding"><a class="header" href="#pkcs5padding">PKCS5Padding</a></h3>
+<p>数据块大小为8位，不够就补足。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="可读性算法.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="消息摘要算法.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="可读性算法.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="消息摘要算法.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

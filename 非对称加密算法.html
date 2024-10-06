@@ -1,0 +1,887 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>非对称加密算法 - 信息安全</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="前言.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded affix "><li class="part-title">密码学</li><li class="chapter-item expanded "><a href="密码学发展史.html"><strong aria-hidden="true">2.</strong> 密码学发展史</a></li><li class="chapter-item expanded "><a href="可读性算法.html"><strong aria-hidden="true">3.</strong> 可读性算法</a></li><li class="chapter-item expanded "><a href="对称加密算法.html"><strong aria-hidden="true">4.</strong> 对称加密算法</a></li><li class="chapter-item expanded "><a href="消息摘要算法.html"><strong aria-hidden="true">5.</strong> 消息摘要算法</a></li><li class="chapter-item expanded "><a href="非对称加密算法.html" class="active"><strong aria-hidden="true">6.</strong> 非对称加密算法</a></li><li class="chapter-item expanded "><a href="数字签名和数字证书.html"><strong aria-hidden="true">7.</strong> 数字签名和数字证书</a></li><li class="chapter-item expanded "><a href="隐写术.html"><strong aria-hidden="true">8.</strong> 隐写术</a></li><li class="chapter-item expanded affix "><li class="part-title">区块链</li><li class="chapter-item expanded affix "><li class="part-title">Solidity</li><li class="chapter-item expanded affix "><li class="part-title">Toolkit</li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">信息安全</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="非对称加密算法"><a class="header" href="#非对称加密算法">非对称加密算法</a></h1>
+<ul>
+<li><a href="#%E7%AE%80%E4%BB%8B">简介</a></li>
+<li><a href="#%E7%89%B9%E7%82%B9">特点</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95rsa">常见算法——RSA</a>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+<li><a href="#%E6%95%B0%E5%AD%97%E7%A4%BA%E4%BE%8B">数字示例</a></li>
+<li><a href="#python%E5%AE%9E%E6%88%98rsa">Python实战RSA</a></li>
+<li><a href="#javascript%E5%AE%9E%E6%88%98rsa">JavaScript实战RSA</a></li>
+</ul>
+</li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95ecc">常见算法——ECC</a>
+<ul>
+<li><a href="#%E5%8E%9F%E7%90%86-1">原理</a></li>
+<li><a href="#python%E5%AE%9E%E6%88%98ecc">Python实战ECC</a></li>
+<li><a href="#javascript%E5%AE%9E%E6%88%98ecc">JavaScript实战ECC</a></li>
+</ul>
+</li>
+<li><a href="#java-rsa%E5%8A%A0%E8%A7%A3%E5%AF%86%E5%AE%8C%E6%95%B4%E5%AE%9E%E8%B7%B5">Java-RSA加解密完整实践</a>
+<ul>
+<li><a href="#%E7%94%9F%E6%88%90%E5%85%AC%E9%92%A5%E5%92%8C%E7%A7%81%E9%92%A5">生成公钥和私钥</a></li>
+<li><a href="#%E7%A7%81%E9%92%A5%E5%8A%A0%E5%AF%86">私钥加密</a></li>
+<li><a href="#%E7%A7%81%E9%92%A5%E5%8A%A0%E5%AF%86%E7%A7%81%E9%92%A5%E8%A7%A3%E5%AF%86">私钥加密私钥解密</a></li>
+<li><a href="#%E7%A7%81%E9%92%A5%E5%8A%A0%E5%AF%86%E5%85%AC%E9%92%A5%E8%A7%A3%E5%AF%86">私钥加密公钥解密</a></li>
+<li><a href="#%E4%BF%9D%E5%AD%98%E5%85%AC%E9%92%A5%E5%92%8C%E7%A7%81%E9%92%A5">保存公钥和私钥</a></li>
+<li><a href="#%E8%AF%BB%E5%8F%96%E7%A7%81%E9%92%A5">读取私钥</a></li>
+<li><a href="#%E8%AF%BB%E5%8F%96%E5%85%AC%E9%92%A5">读取公钥</a></li>
+<li><a href="#rsa%E5%8A%A0%E8%A7%A3%E5%AF%86%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81">RSA加解密完整代码</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="简介"><a class="header" href="#简介">简介</a></h2>
+<p>① 非对称加密算法又称现代加密算法。</p>
+<p>② 非对称加密是计算机通信安全的基石，保证了加密数据不会被破解。</p>
+<p>③ 与对称加密算法不同，非对称加密算法需要两个密钥：公开密钥（public key） 和私有密钥（private key）</p>
+<p>④ 公开密钥和私有密钥是一对</p>
+<p>⑤ 如果用公开密钥对数据进行加密，只有用对应的私有密钥才能解密。</p>
+<p>⑥ 如果用私有密钥对数据进行加密，只有用对应的公开密钥才能解密。</p>
+<p>⑦ 因为加密和解密使用的是两个不同的密钥，所以这种算法叫作非对称加密算法。</p>
+<h2 id="特点"><a class="header" href="#特点">特点</a></h2>
+<ul>
+<li>加密和解密使用不同的密钥</li>
+<li>如果使用私钥加密, 只能使用公钥解密</li>
+<li>如果使用公钥加密, 只能使用私钥解密</li>
+<li>处理数据的速度较慢, 因为安全级别高</li>
+</ul>
+<h2 id="常见算法rsa"><a class="header" href="#常见算法rsa">常见算法——RSA</a></h2>
+<p>RSA算法是一种非对称加密算法，由罗纳德·李维斯特和阿迪·萨莫尔等人发明的。RSA算法的原理基于数论中的大数分解问题，即将一个大数分解为其质因数的乘积。因为大数分解是一个非常困难的问题，使得RSA算法能够提供较高的安全性。</p>
+<p>RSA算法的原理是基于两个密钥，分别为公钥和私钥。公钥用于加密数据，私钥用于解密数据。首先，生成一对公钥和私钥，并将公钥发布给他人，而私钥保密。当他人想要向你发送加密的数据时，他们使用你的公钥对数据进行加密，只有持有私钥的你才能解密数据。</p>
+<p>RSA算法广泛应用在安全传输和加密通信领域，如HTTPS通信、数字签名、加密文档等。其安全性和可靠性使得RSA成为公认的重要加密算法之一。</p>
+<h3 id="原理"><a class="header" href="#原理">原理</a></h3>
+<p>假设Alice想要向Bob发送加密的消息，他们采用RSA算法进行加密和解密。</p>
+<ol>
+<li>
+<p>生成公钥和私钥：
+Alice生成公钥(n, e)和私钥(n, d)。其中，n是两个大素数p和q的乘积，e是与(d * e mod φ(n) = 1)互质的数，d是e的模φ(n)的乘法逆元。</p>
+</li>
+<li>
+<p>加密消息：
+Alice获取Bob的公钥(n, e)，并将消息M转换为整数m。然后，使用公钥进行加密，计算密文c = m^e mod n。</p>
+</li>
+<li>
+<p>解密消息：
+Bob收到密文c后，使用自己的私钥进行解密，计算明文消息m = c^d mod n。</p>
+</li>
+</ol>
+<p>这样，Bob就成功解密了Alice发送的消息。RSA算法通过公钥和私钥的配对来保证数据的安全传输和机密性。</p>
+<h3 id="数字示例"><a class="header" href="#数字示例">数字示例</a></h3>
+<p>首先生成密钥对, 公钥为(5,14), 私钥为(11,14)</p>
+<p>现在A希望将原文2发送给B</p>
+<p>A使用公钥加密数据， 2的5次方mod 14 = 4 , 将密文4发送给B</p>
+<p>B使用私钥解密数据， 4的11次方mod14 = 2, 得到原文2</p>
+<h3 id="python实战rsa"><a class="header" href="#python实战rsa">Python实战RSA</a></h3>
+<p>以下是一个使用Python实现RSA算法的示例，并对给定明文进行加密和解密：</p>
+<p>RSA算法示例：</p>
+<pre><code class="language-python">from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_v1_5
+
+# 生成RSA密钥对
+key = RSA.generate(2048)
+public_key = key.publickey()
+private_key = key
+
+# 加密和解密操作
+cipher = PKCS1_v1_5.new(public_key)
+text = "新中国还在黎明中等待复苏"
+encrypted = cipher.encrypt(text.encode('utf-8'))
+
+decrypt_cipher = PKCS1_v1_5.new(private_key)
+decrypted = decrypt_cipher.decrypt(encrypted, None).decode('utf-8')
+
+print("RSA加密后的密文：", encrypted)
+print("RSA解密后的明文：", decrypted)
+</code></pre>
+<p>这两个示例演示了如何使用Python中的RSA和ECC算法对给定的明文进行加密和解密操作。请注意，为了运行这些示例，您可能需要安装相应的密码学库（如pycryptodome和cryptography）。</p>
+<h3 id="javascript实战rsa"><a class="header" href="#javascript实战rsa">JavaScript实战RSA</a></h3>
+<p>以下是一个使用JavaScript调用RSA算法的示例：</p>
+<p>RSA算法示例：</p>
+<pre><code class="language-javascript">// 使用CryptoJS库进行RSA加密
+const publicKey = "&lt;公钥&gt;";  // 公钥需要替换为实际的公钥
+const plainText = "新中国还在黎明中等待复苏";
+const encrypted = CryptoJS.AES.encrypt(plainText, publicKey).toString();
+
+console.log("RSA加密后的密文：", encrypted);
+</code></pre>
+<p>以上示例中使用了CryptoJS库进行RSA加密，具体的实现细节需要您根据实际情况调整。</p>
+<h2 id="常见算法ecc"><a class="header" href="#常见算法ecc">常见算法——ECC</a></h2>
+<p>椭圆曲线密码学（ECC）是一种基于椭圆曲线理论的密码学技术。ECC的起源可追溯到1985年，由Neal Koblitz和Victor Miller提出。ECC算法在比传统RSA算法更短的密钥长度下，提供了相同甚至更高的安全性，因此在资源受限的环境中广泛应用。</p>
+<p>ECC算法的原理是基于椭圆曲线上的点运算。椭圆曲线是由满足特定方程的点构成的集合，具有一些特殊的数学性质。对于给定的椭圆曲线、基点和一条直线，通过多次点运算，可以实现椭圆曲线上的加法、减法、倍乘等操作。ECC算法使用这些点运算来实现加密和签名操作。</p>
+<p>ECC算法的应用包括加密通信、数字签名、身份认证等领域。在移动设备、IoT设备和智能卡等资源受限的环境中，ECC算法可以提供更高效的安全解决方案。随着量子计算机等新兴技术的发展，ECC算法也被认为是一种抵御量子计算攻击的有效手段。因此，ECC算法在密码学领域具有重要的地位和广泛的应用前景。</p>
+<h3 id="原理-1"><a class="header" href="#原理-1">原理</a></h3>
+<p>假设Alice和Bob想要使用ECC算法进行加密和解密通信。</p>
+<ol>
+<li>
+<p>生成公钥和私钥：
+Alice和Bob各自生成一对公钥和私钥。每对密钥包括一个椭圆曲线上的点作为公钥，以及一个私钥作为椭圆曲线上的一个整数。</p>
+</li>
+<li>
+<p>加密消息：
+Alice先将消息m转换为椭圆曲线上的点P，然后使用Bob的公钥点Q对P进行倍乘运算，得到密文点C = k * Q。将C发送给Bob。</p>
+</li>
+<li>
+<p>解密消息：
+Bob收到密文点C后，使用自己的私钥整数k对C进行倍乘运算，计算得到解密后的点P = k * C。然后将P转换为明文消息m。</p>
+</li>
+</ol>
+<p>这样，Bob成功解密了Alice发送的消息。ECC算法通过椭圆曲线上的点运算来保证数据的安全传输和机密性。</p>
+<h3 id="python实战ecc"><a class="header" href="#python实战ecc">Python实战ECC</a></h3>
+<p>以下是一个使用Python实现ECC算法的示例，并对给定明文进行加密和解密：</p>
+<p>ECC算法示例：</p>
+<pre><code class="language-python">from cryptography.hazmat.primitives.asymmetric import ec
+from cryptography.hazmat.backends import default_backend
+
+# 生成ECC密钥对
+private_key = ec.generate_private_key(ec.SECP256R1(), default_backend())
+public_key = private_key.public_key()
+
+# 加密和解密操作
+encrypted = public_key.encrypt(b"新中国还在黎明中等待复苏", ec.ECIES())
+decrypted = private_key.decrypt(encrypted, ec.ECIES())
+
+print("ECC加密后的密文：", encrypted)
+print("ECC解密后的明文：", decrypted.decode('utf-8'))
+</code></pre>
+<p>这两个示例演示了如何使用Python中的RSA和ECC算法对给定的明文进行加密和解密操作。请注意，为了运行这些示例，您可能需要安装相应的密码学库（如pycryptodome和cryptography）。</p>
+<h3 id="javascript实战ecc"><a class="header" href="#javascript实战ecc">JavaScript实战ECC</a></h3>
+<p>以下是一个使用JavaScript调用ECC算法的示例：</p>
+<p>ECC算法示例：</p>
+<pre><code class="language-javascript">// 使用elliptic库进行ECC加密
+const EC = require('elliptic').ec;
+const ec = new EC('secp256k1');  // 选择椭圆曲线参数
+const key = ec.genKeyPair();
+
+const plainText = "新中国还在黎明中等待复苏";
+const message = Buffer.from(plainText, 'utf8');
+
+const signature = key.sign(message);
+const validSignature = key.verify(message, signature);
+
+console.log("ECC签名：", signature);
+console.log("ECC签名验证结果：", validSignature);
+</code></pre>
+<p>以上示例中使用了elliptic库进行ECC签名和验证操作，具体的实现细节需要您根据实际情况调整。请注意，为了运行这些示例，您可能需要安装相应的JavaScript密码学库。</p>
+<h2 id="java-rsa加解密完整实践"><a class="header" href="#java-rsa加解密完整实践">Java-RSA加解密完整实践</a></h2>
+<h3 id="生成公钥和私钥"><a class="header" href="#生成公钥和私钥">生成公钥和私钥</a></h3>
+<p>生成RSA的公钥私钥：KeyPairGenerator类</p>
+<pre><code class="language-java">package code.async;
+
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        // 加密算法
+        String algorithm = "RSA";
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+        // 打印私钥
+        System.out.println(privateKeyString);
+        // 打印公钥
+        System.out.println(publicKeyString);
+    }
+}
+
+</code></pre>
+<p>运行程序：先打印的是私钥 ， 后面打印的是公钥</p>
+<h3 id="私钥加密"><a class="header" href="#私钥加密">私钥加密</a></h3>
+<pre><code class="language-java">package code.async;
+
+import javax.crypto.Cipher;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String plainText = "硅谷没有包子，就像中南海没有小李子一样。没有鸡翅，你吃的什么？";
+
+        // 加密算法
+        String algorithm = "RSA";
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE,privateKey);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(plainText.getBytes());
+        System.out.println(Base64.getEncoder().encodeToString(bytes));
+    }
+}
+
+</code></pre>
+<h3 id="私钥加密私钥解密"><a class="header" href="#私钥加密私钥解密">私钥加密私钥解密</a></h3>
+<pre><code class="language-java">package code.async;
+
+import javax.crypto.Cipher;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String plainText = "硅谷没有包子，就像中南海没有小李子一样。没有鸡翅，你吃的什么？";
+
+        // 加密算法
+        String algorithm = "RSA";
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE,privateKey);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(plainText.getBytes());
+        System.out.println(Base64.getEncoder().encodeToString(bytes));
+
+        // 私钥进行解密
+        cipher.init(Cipher.DECRYPT_MODE,privateKey);
+        // 对密文进行解密，不需要使用base64，因为原文不会乱码
+        byte[] bytes1 = cipher.doFinal(bytes);
+        System.out.println(new String(bytes1));
+    }
+}
+
+
+</code></pre>
+<p>运行程序 ，报错。</p>
+<p>原因：私钥加密，只能公钥解密</p>
+<h3 id="私钥加密公钥解密"><a class="header" href="#私钥加密公钥解密">私钥加密公钥解密</a></h3>
+<pre><code class="language-java">package code.async;
+
+import javax.crypto.Cipher;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.util.Base64;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String plainText = "硅谷没有包子，就像中南海没有小李子一样。没有鸡翅，你吃的什么？";
+
+        // 加密算法
+        String algorithm = "RSA";
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE,privateKey);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(plainText.getBytes());
+        System.out.println(Base64.getEncoder().encodeToString(bytes));
+
+        // 私钥进行解密
+        cipher.init(Cipher.DECRYPT_MODE,publicKey);
+        // 对密文进行解密，不需要使用base64，因为原文不会乱码
+        byte[] bytes1 = cipher.doFinal(bytes);
+        System.out.println(new String(bytes1));
+    }
+}
+
+</code></pre>
+<p>成功输出明文。</p>
+<h3 id="保存公钥和私钥"><a class="header" href="#保存公钥和私钥">保存公钥和私钥</a></h3>
+<pre><code class="language-java">package com.TianHan;
+
+import javax.crypto.Cipher;
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.util.Base64;
+import org.apache.commons.io.FileUtils;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        // 加密算法
+        String algorithm = "RSA";
+
+        //生成密钥对并保存在本地文件中
+        generateKeyToFile(algorithm, "./code/src/main/resources/a.pub", "./code/src/main/resources/a.pri");
+    }
+
+    /**
+     * 生成密钥对并保存在本地文件中
+     *
+     * @param algorithm : 算法
+     * @param pubPath   : 公钥保存路径
+     * @param priPath   : 私钥保存路径
+     * @throws Exception
+     */
+    private static void generateKeyToFile(String algorithm, String pubPath, String priPath) throws Exception {
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+        // 保存文件
+
+        FileUtils.writeStringToFile(new File(pubPath), publicKeyString, StandardCharsets.UTF_8);
+        FileUtils.writeStringToFile(new File(priPath), privateKeyString, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 解密数据
+     *
+     * @param algorithm      : 算法
+     * @param encrypted      : 密文
+     * @param key            : 密钥
+     * @return : 原文
+     * @throws Exception
+     */
+    public static String decryptRSA(String algorithm,Key key,String encrypted) throws Exception{
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 私钥进行解密
+        cipher.init(Cipher.DECRYPT_MODE,key);
+        // 由于密文进行了Base64编码, 在这里需要进行解码
+        byte[] decode = Base64.getDecoder().decode(encrypted);
+        // 对密文进行解密，不需要使用base64，因为原文不会乱码
+        byte[] bytes1 = cipher.doFinal(decode);
+        System.out.println(new String(bytes1));
+        return new String(bytes1);
+
+    }
+    /**
+     * 使用密钥加密数据
+     *
+     * @param algorithm      : 算法
+     * @param input          : 原文
+     * @param key            : 密钥
+     * @return : 密文
+     * @throws Exception
+     */
+    public static String encryptRSA(String algorithm, Key key, String input) throws Exception{
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(input.getBytes());
+        // 对密文进行Base64编码
+        System.out.println(Base64.getEncoder().encodeToString(bytes));
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+</code></pre>
+<p>运行在项目目录下生成私钥</p>
+<p>运行在项目目录下生成公钥</p>
+<h3 id="读取私钥"><a class="header" href="#读取私钥">读取私钥</a></h3>
+<pre><code class="language-java">package com.TianHan;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.util.Base64;
+import org.apache.commons.io.FileUtils;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String path = "./code/src/main/resources/";
+
+        // 加密算法
+        String algorithm = "RSA";
+        // 从文件读取私钥 ，这个是自定义的方法
+        PrivateKey privateKey = getPrivateKey(path + "a.pri", algorithm);
+        System.out.println("privateKey: " + privateKey);
+    }
+
+    public static PrivateKey getPrivateKey(String priPath,String algorithm) throws Exception{
+        // 将文件内容转为字符串
+        String privateKeyString = FileUtils.readFileToString(new File(priPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString));
+        // 生成私钥
+        return keyFactory.generatePrivate(spec);
+    }
+}
+</code></pre>
+<h3 id="读取公钥"><a class="header" href="#读取公钥">读取公钥</a></h3>
+<pre><code class="language-java">package com.TianHan;
+
+import java.io.File;
+import java.nio.charset.Charset;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import org.apache.commons.io.FileUtils;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String path = "./code/src/main/resources/";
+
+        // 加密算法
+        String algorithm = "RSA";
+        PublicKey publicKey = getPublicKey(path + "a.pub", algorithm);
+        System.out.println(publicKey);
+    }
+
+    public static PublicKey getPublicKey(String publicPath, String algorithm) throws Exception{
+        // 将文件内容转为字符串
+        String publicKeyString = FileUtils.readFileToString(new File(publicPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyString));
+        // 生成公钥
+        return keyFactory.generatePublic(spec);
+    }
+}
+</code></pre>
+<h3 id="rsa加解密完整代码"><a class="header" href="#rsa加解密完整代码">RSA加解密完整代码</a></h3>
+<pre><code class="language-java">package com.TianHan;
+
+import javax.crypto.Cipher;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Base64;
+import org.apache.commons.io.FileUtils;
+
+public class RSADemo {
+    public static void main(String[] args) throws Exception {
+
+        String plainText = "硅谷没有包子，就像中南海没有小李子一样。没有鸡翅，你吃的什么？";
+
+        String path = "./code/src/main/resources/";
+        // 加密算法
+        String algorithm = "RSA";
+        // 从文件读取私钥 ，这个是自定义的方法
+        PrivateKey privateKey = getPrivateKey(path + "a.pri", algorithm);
+        PublicKey publicKey = getPublicKey(path + "a.pub", algorithm);
+
+        String encryptStr = encryptRSA(algorithm, privateKey, plainText);
+        String decryptStr = decryptRSA(algorithm, publicKey, encryptStr);
+        System.out.println(decryptStr);
+    }
+
+    public static PublicKey getPublicKey(String publicPath, String algorithm) throws Exception{
+        // 将文件内容转为字符串
+        String publicKeyString = FileUtils.readFileToString(new File(publicPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyString));
+        // 生成公钥
+        return keyFactory.generatePublic(spec);
+    }
+
+    public static PrivateKey getPrivateKey(String priPath,String algorithm) throws Exception{
+        // 将文件内容转为字符串
+        String privateKeyString = FileUtils.readFileToString(new File(priPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString));
+        // 生成私钥
+        return keyFactory.generatePrivate(spec);
+    }
+
+    /**
+     * 生成密钥对并保存在本地文件中
+     *
+     * @param algorithm : 算法
+     * @param pubPath   : 公钥保存路径
+     * @param priPath   : 私钥保存路径
+     * @throws Exception
+     */
+    private static void generateKeyToFile(String algorithm, String pubPath, String priPath) throws Exception {
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+        // 保存文件
+
+        FileUtils.writeStringToFile(new File(pubPath), publicKeyString, StandardCharsets.UTF_8);
+        FileUtils.writeStringToFile(new File(priPath), privateKeyString, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 解密数据
+     *
+     * @param algorithm      : 算法
+     * @param encrypted      : 密文
+     * @param key            : 密钥
+     * @return : 原文
+     * @throws Exception
+     */
+    public static String decryptRSA(String algorithm,Key key,String encrypted) throws Exception{
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 私钥进行解密
+        cipher.init(Cipher.DECRYPT_MODE,key);
+        // 由于密文进行了Base64编码, 在这里需要进行解码
+        byte[] decode = Base64.getDecoder().decode(encrypted);
+        // 对密文进行解密，不需要使用base64，因为原文不会乱码
+        byte[] bytes1 = cipher.doFinal(decode);
+        //System.out.println(new String(bytes1));
+        return new String(bytes1);
+
+    }
+    /**
+     * 使用密钥加密数据
+     *
+     * @param algorithm      : 算法
+     * @param input          : 原文
+     * @param key            : 密钥
+     * @return : 密文
+     * @throws Exception
+     */
+    public static String encryptRSA(String algorithm, Key key, String input) throws Exception{
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(input.getBytes());
+        // 对密文进行Base64编码
+        //System.out.println(Base64.getEncoder().encodeToString(bytes));
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="消息摘要算法.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="数字签名和数字证书.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="消息摘要算法.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="数字签名和数字证书.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

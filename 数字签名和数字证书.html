@@ -1,0 +1,702 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>数字签名和数字证书 - 信息安全</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('light')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="前言.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded affix "><li class="part-title">密码学</li><li class="chapter-item expanded "><a href="密码学发展史.html"><strong aria-hidden="true">2.</strong> 密码学发展史</a></li><li class="chapter-item expanded "><a href="可读性算法.html"><strong aria-hidden="true">3.</strong> 可读性算法</a></li><li class="chapter-item expanded "><a href="对称加密算法.html"><strong aria-hidden="true">4.</strong> 对称加密算法</a></li><li class="chapter-item expanded "><a href="消息摘要算法.html"><strong aria-hidden="true">5.</strong> 消息摘要算法</a></li><li class="chapter-item expanded "><a href="非对称加密算法.html"><strong aria-hidden="true">6.</strong> 非对称加密算法</a></li><li class="chapter-item expanded "><a href="数字签名和数字证书.html" class="active"><strong aria-hidden="true">7.</strong> 数字签名和数字证书</a></li><li class="chapter-item expanded "><a href="隐写术.html"><strong aria-hidden="true">8.</strong> 隐写术</a></li><li class="chapter-item expanded affix "><li class="part-title">区块链</li><li class="chapter-item expanded affix "><li class="part-title">Solidity</li><li class="chapter-item expanded affix "><li class="part-title">Toolkit</li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">信息安全</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="数字签名和数字证书"><a class="header" href="#数字签名和数字证书">数字签名和数字证书</a></h1>
+<ul>
+<li><a href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E5%85%AC%E9%92%A5%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D">数字签名（公钥数字签名）</a>
+<ul>
+<li><a href="#%E8%B5%B7%E6%BA%90">起源</a></li>
+<li><a href="#%E5%8F%91%E5%B1%95">发展</a></li>
+<li><a href="#%E5%8E%9F%E7%90%86">原理</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E5%AD%97%E8%AF%81%E4%B9%A6">数字证书</a></li>
+<li><a href="#%E7%BD%91%E9%A1%B5%E5%8A%A0%E5%AF%86">网页加密</a>
+<ul>
+<li><a href="#%E7%BD%91%E7%BB%9C%E7%9B%91%E6%8E%A7">网络监控</a></li>
+<li><a href="#%E9%9A%90%E7%A7%81%E4%BF%9D%E6%8A%A4">隐私保护</a></li>
+<li><a href="#python%E6%A8%A1%E6%8B%9F%E7%BD%91%E9%A1%B5%E5%8A%A0%E5%AF%86">Python模拟网页加密</a></li>
+</ul>
+</li>
+<li><a href="#ca%E8%AE%A4%E8%AF%81%E4%B8%AD%E5%BF%83">CA认证中心</a>
+<ul>
+<li><a href="#%E8%B5%B7%E6%BA%90-1">起源</a></li>
+<li><a href="#%E5%8F%91%E5%B1%95-1">发展</a></li>
+<li><a href="#%E5%8E%9F%E7%90%86-1">原理</a></li>
+<li><a href="#%E5%85%B8%E5%9E%8B%E8%AE%A4%E8%AF%81%E4%B8%AD%E5%BF%83">典型认证中心</a></li>
+</ul>
+</li>
+<li><a href="#%E6%95%B0%E5%AD%97%E7%AD%BE%E5%90%8D%E5%AE%9E%E6%88%98">数字签名实战</a>
+<ul>
+<li><a href="#python">Python</a></li>
+<li><a href="#java">Java</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="数字签名公钥数字签名"><a class="header" href="#数字签名公钥数字签名">数字签名（公钥数字签名）</a></h2>
+<h3 id="起源"><a class="header" href="#起源">起源</a></h3>
+<p>数字签名是一种用于确保数字信息的完整性和真实性的加密技术。它起源于1970年代的密码学领域，由Whitfield Diffie 和Martin Hellman首次提出了公钥密码体制。数字签名的原理是使用非对称加密算法生成一对密钥，分别是私钥和公钥。私钥由信息的发送者保管，公钥可以被任何人获取。</p>
+<p>数字签名（又称公钥数字签名）是只有信息的发送者才能产生的别人无法伪造的一段数字串，这段数字串同时也是对信息的发送者发送信息真实性的一个有效证明。它是一种类似写在纸上的普通的物理签名，但是使用了公钥加密领域的技术来实现的，用于鉴别数字信息的方法。一套数字签名通常定义两种互补的运算，一个用于签名，另一个用于验证。</p>
+<p>数字签名是非对称密钥加密技术与数字摘要技术的应用。</p>
+<h3 id="发展"><a class="header" href="#发展">发展</a></h3>
+<p>数字签名在发展过程中，逐渐被广泛应用在各种领域，包括电子支付、电子合同等。同时，为了满足不同应用场景的需求，不断有新的数字签名算法被提出，比如RSA、DSA等。随着互联网和移动通信技术的飞速发展，数字签名在保障信息安全和确保通信可靠性方面发挥着越来越重要的作用。</p>
+<h3 id="原理"><a class="header" href="#原理">原理</a></h3>
+<p>数字签名的生成过程一般分为两步：首先，信息的发送者使用私钥对信息进行加密，生成一个数字签名；然后，接收者使用发送者的公钥对数字签名进行解密，以验证信息的完整性和真实性。如果数字签名是有效的，接收者就可以确认信息确实是由发送者发送的，并且在传输过程中没有被篡改。</p>
+<p>为了理解得清楚，我们通过案例一步一步来讲解。话说张三有俩好哥们A、B。由于工作原因，张三和AB写邮件的时候为了安全都需要加密。于是张三想到了数字签名：</p>
+<p>整个思路是这个样子的：</p>
+<p>第一步：加密采用非对称加密，张三有三把钥匙，两把公钥，送给朋友。一把私钥留给自己。</p>
+<p>第二步：A或者B写邮件给张三：A先用公钥对邮件加密，然后张三收到邮件之后使用私钥解密。</p>
+<p>第三步：张三写邮件给A或者B：</p>
+<p>（1）张三写完邮件，先用hash函数生成邮件的摘要，附着在文章上面，这就完成了数字签名，然后张三再使用私钥加密。就可以把邮件发出去了。</p>
+<p>（2）A或者是B收到邮件之后，先把数字签名取下来，然后使用自己的公钥解密即可。这时候取下来的数字签名中的摘要若和张三的一致，那就认为是张三发来的，再对信件本身使用Hash函数，将得到的结果，与上一步得到的摘要进行对比。如果两者一致，就证明这封信未被修改过。</p>
+<p>上面的流程我们使用一张图来演示一下：</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20240919164855.png" alt="" /></p>
+<p>服务器把内容（证书明文）经过hash算法得到证书的摘要，再经过私钥加密得到证书的数字签名，然后发送证书和数字签名给浏览器。</p>
+<p>浏览器得到了证书和数字签名，先拿证书里的公钥对对数字签名解密得到摘要。再拿证书里的hash算法对证书进行hash得到摘要。对比连个摘要是否相同。如果相同，则代表证书没有被修改过，也就证明了是该服务器发过来的。</p>
+<p>但是如果别人伪造了一个证书呢？比如证书里写的颁发给了baidu，而且公钥是第三者的，你发送的内容就被别人拦截下来用第三者的私钥解密，偷看后为了不被发现再用第三者的私钥加密发送给baidu。</p>
+<p>为了验证证书没被篡改过，我们可以取认证中心鉴定。</p>
+<h2 id="数字证书"><a class="header" href="#数字证书">数字证书</a></h2>
+<p>数字证书是一种用于在网络通信中进行身份验证和加密数据传输的电子证书。它是CA数字认证中心（Certificate Authority）签发的，用于证明某个实体（个人、组织、服务器等）的身份和公钥的有效性。数字证书通常包含以下信息：</p>
+<ol>
+<li>
+<p><strong>主题信息</strong>：证书持有者的信息，如姓名、电子邮件地址、组织名称等。</p>
+</li>
+<li>
+<p><strong>公钥</strong>：用于加密和解密数据的公钥，公钥是证书持有者的一部分密钥对，另一部分是私钥，只有持有者才知道。</p>
+</li>
+<li>
+<p><strong>证书序列号</strong>：标识证书的唯一序列号，用于区分不同的证书。</p>
+</li>
+<li>
+<p><strong>证书有效期</strong>：证书的生效日期和过期日期，表示证书的有效期限。</p>
+</li>
+<li>
+<p><strong>数字签名</strong>：CA数字认证中心对证书内容的签名，用于验证证书的真实性和完整性。</p>
+</li>
+</ol>
+<p>数字证书的基本原理是通过CA数字认证中心信任链的支持，使用非对称加密算法来确保数字证书的可信性和安全性。一般来说，数字证书的签发流程包括以下步骤：</p>
+<ol>
+<li>
+<p><strong>申请证书</strong>：证书持有者向CA数字认证中心提交证书申请，包括相关个人或组织的身份认证信息。</p>
+</li>
+<li>
+<p><strong>验证身份</strong>：CA数字认证中心会对证书持有者提交的身份信息进行验证，确保其真实性，并签发数字证书。</p>
+</li>
+<li>
+<p><strong>颁发证书</strong>：CA数字认证中心在验证通过后，会用自己的私钥对数字证书进行签名，并将数字证书发送给证书持有者。</p>
+</li>
+<li>
+<p><strong>使用数字证书</strong>：证书持有者可以将数字证书应用于加密通信、签名验证、身份验证等场景，确保通信的安全性和可信性。</p>
+</li>
+</ol>
+<p>在网页加密中，数字证书扮演着重要角色，用户在访问一个通过HTTPS协议保护的网站时，会验证网站的数字证书，以确认网站的身份和数据传输的安全性。数字证书是构建公钥基础设施（PKI）的核心组成部分，为网络通信提供了必要的安全保障。</p>
+<h2 id="网页加密"><a class="header" href="#网页加密">网页加密</a></h2>
+<p>网页加密的原理主要是通过使用HTTPS协议来保护网页的传输过程中的数据安全。HTTPS是HTTP与SSL/TLS协议的组合，可以确保网页在传输过程中的机密性、完整性和身份验证。</p>
+<p>下面是网页加密的原理介绍：</p>
+<ol>
+<li>
+<p><strong>建立安全连接</strong>：在使用HTTPS的网页上，用户打开网页时，浏览器会向网站请求建立安全连接。网站会发送自己的SSL证书给浏览器，证书包含了网站的公钥等信息。</p>
+</li>
+<li>
+<p><strong>验证证书</strong>：浏览器会验证网站的SSL证书，确保证书的有效性和真实性。浏览器会检查证书的签发机构和有效期等信息，以确定当前网站的身份是否可信。</p>
+</li>
+<li>
+<p><strong>生成会话密钥</strong>：一旦证书验证成功，浏览器会生成一个随机的会话密钥（对称密钥），用于加密网页内容的传输。</p>
+</li>
+<li>
+<p><strong>加密数据传输</strong>：浏览器使用网站的公钥对会话密钥进行加密，并发送给网站。网站利用私钥解密得到会话密钥，之后浏览器和网站之间的通信会使用这个会话密钥对数据进行加密和解密。</p>
+</li>
+<li>
+<p><strong>传输数据</strong>：一旦安全连接建立，网页上的数据（包括登录信息、个人数据等）在传输过程中都会被加密，保护数据的机密性。</p>
+</li>
+</ol>
+<p>通过使用HTTPS协议，网页加密可以有效防止数据在传输过程中被窃取、篡改和窥探，提高了网页的安全性和用户的隐私保护。现在越来越多的网站都在推行使用HTTPS协议，以提供更安全可靠的访问环境。</p>
+<h3 id="网络监控"><a class="header" href="#网络监控">网络监控</a></h3>
+<p>虽然HTTPS协议可以加密网页传输过程中的数据，以保护数据的机密性，但外部机构如ISP、学校或公司仍然有能力检测到用户通过浏览器发生的数据。这是因为虽然HTTPS确保了数据传输过程中的加密和安全性，但并不阻止外部机构对一些元数据进行监视和检测。以下是一些原因：</p>
+<ol>
+<li>
+<p><strong>域名解析</strong>：当用户在浏览器中输入一个网址时，浏览器首先会向DNS服务器发送一个域名解析请求，以获取网站的IP地址。这个请求是明文传输的，即使后续访问是通过HTTPS加密的，ISP仍然可以通过监视DNS请求来知道用户正在访问哪些网站。</p>
+</li>
+<li>
+<p><strong>SNI扩展</strong>：在建立HTTPS连接时，客户端向服务器发送Server Name Indication (SNI)扩展，用于指定要访问的域名。这个SNI扩展是明文传输的，可以让网络中的设备（如防火墙、代理服务器）识别出用户正在访问哪个网站。</p>
+</li>
+<li>
+<p><strong>SSL握手过程</strong>：在SSL/TLS握手过程中，通信双方会交换加密算法和密钥信息，这些信息中也包括明文的服务器证书。虽然握手过程中的关键数据是加密的，但一些元数据仍然是明文可见的，外部机构可以据此获取有关通信的信息。</p>
+</li>
+<li>
+<p><strong>终端设备</strong>：外部机构也可以通过检测终端设备上的浏览历史、缓存数据等信息来掌握用户的网络活动。此外，浏览器的插件或工具也可能会泄露一些用户的浏览数据。</p>
+</li>
+</ol>
+<p>总的来说，虽然HTTPS可以保护数据的机密性和安全性，但并不能完全阻止外部机构对用户网络活动的监视和检测。在一定程度上，外部机构仍然能够通过其他方式获取用户的网络活动信息。因此，用户在网络使用中，仍需保持警惕，注意个人隐私保护。</p>
+<p>外部机构可以通过多种方式检测终端设备上的浏览历史、缓存数据等信息来了解用户的网络活动。以下是一些常见的方式：</p>
+<ol>
+<li>
+<p><strong>浏览器历史记录</strong>：浏览器会保存用户的浏览历史记录，包括访问过的网页和搜索记录。外部机构可以通过访问用户的设备或网络流量分析来获取这些信息。</p>
+</li>
+<li>
+<p><strong>Cookie和网站数据</strong>：网站可以在用户的设备上设置Cookie，用于跟踪用户的活动和偏好。外部机构可以访问用户设备上的Cookie数据来获取用户的活动信息。</p>
+</li>
+<li>
+<p><strong>浏览器插件和扩展</strong>：一些恶意的浏览器插件和工具可能会窃取用户的浏览历史记录、密码等敏感信息，从而泄露用户的隐私。</p>
+</li>
+<li>
+<p><strong>地址栏和搜索历史</strong>：外部机构可以通过访问用户设备上的地址栏和搜索历史记录来了解用户的搜索偏好和访问习惯。</p>
+</li>
+</ol>
+<h3 id="隐私保护"><a class="header" href="#隐私保护">隐私保护</a></h3>
+<p>为了防备外部机构通过检测终端设备上的浏览历史、缓存数据等信息来掌握用户的网络活动，用户可以采取一些措施：</p>
+<ol>
+<li>
+<p><strong>定期清除浏览历史和缓存</strong>：定期清除浏览器的历史记录、缓存数据和Cookie，可以减少外部机构获取用户信息的可能性。</p>
+</li>
+<li>
+<p><strong>使用隐身模式浏览</strong>：隐身模式浏览可以防止浏览记录、Cookie等数据被保存在设备上，提高个人隐私保护。</p>
+</li>
+<li>
+<p><strong>谨慎安装浏览器插件</strong>：只安装信任的浏览器插件和扩展，避免安装未知来源或官方未审核的插件。</p>
+</li>
+<li>
+<p><strong>使用VPN和加密工具</strong>：使用VPN服务和加密工具可以加密网络流量，提高网络通信的隐私性和安全性。</p>
+</li>
+<li>
+<p><strong>定期更新和加强设备安全措施</strong>：更新操作系统和软件、安装杀毒软件和防火墙等安全措施，保护设备免受恶意软件和攻击。</p>
+</li>
+</ol>
+<p>除被访问网站和浏览器之外的机构或组织通常不能直接获取用户的浏览器Cookie等信息，因为Cookie数据存储在用户设备上的浏览器中，并受同源策略限制（只有在同一域名下的网站才能访问和修改Cookie）。但有一些情况下，外部机构或组织可能会通过一些方式间接获取用户的浏览器Cookie等信息，例如：</p>
+<ol>
+<li>
+<p><strong>网络嗅探</strong>：外部机构可以通过网络嗅探技术拦截用户的网络流量，尤其是未加密的HTTP流量。在HTTP请求和响应中，可能会携带用户的Cookie数据，外部机构可以从中获取这些数据。</p>
+</li>
+<li>
+<p><strong>中间人攻击</strong>：外部机构可能通过在用户和目标服务器之间插入中间人进行攻击，欺骗用户设备和服务器之间的通信。在这种情况下，中间人可以获取用户的Cookie信息。</p>
+</li>
+<li>
+<p><strong>恶意软件</strong>：一些恶意软件和浏览器插件可能会窃取用户设备上存储的Cookie等敏感信息，并将其传送给外部机构。这些恶意软件可能会通过社会工程学手段或漏洞利用等方式感染用户的设备。</p>
+</li>
+</ol>
+<p>防止外部机构通过这些方式获取用户浏览器Cookie等信息可以采取以下措施：</p>
+<ol>
+<li>
+<p>使用HTTPS连接：通过使用HTTPS连接访问网站可以加密数据传输，防止中间人窃听，提高数据安全性。</p>
+</li>
+<li>
+<p>避免使用不安全的公共Wi-Fi：尽量避免在不安全的公共Wi-Fi网络上进行敏感操作，以免遭遇网络嗅探等攻击。</p>
+</li>
+<li>
+<p>定期检查设备安全：定期检查设备上的恶意软件，并使用杀毒软件和防火墙等工具保护设备安全。</p>
+</li>
+<li>
+<p>谨慎安装插件：只安装官方可信的浏览器插件和扩展，以避免安全风险。</p>
+</li>
+</ol>
+<h3 id="python模拟网页加密"><a class="header" href="#python模拟网页加密">Python模拟网页加密</a></h3>
+<p>是的，可以使用Python模拟网页加密的过程。虽然在实际生产环境中，网页加密是通过浏览器和服务器之间的SSL/TLS协议完成的，但是我们可以使用Python中的加密库和模块来模拟这一过程。</p>
+<p>以下是一个简单的Python代码示例，演示了如何使用PyCryptodome库来模拟网页加密的过程：</p>
+<pre><code class="language-python">from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+
+# 模拟网站端
+private_key = RSA.generate(2048)
+public_key = private_key.publickey()
+
+# 模拟浏览器端
+message = b"Hello, world!"
+
+# 模拟浏览器端生成会话密钥
+session_key = b"ThisIsASessionKey"
+
+# 浏览器端使用网站的公钥对会话密钥进行加密
+cipher = PKCS1_OAEP.new(public_key)
+encrypted_session_key = cipher.encrypt(session_key)
+
+# 网站服务端使用私钥解密得到会话密钥
+decrypt_cipher = PKCS1_OAEP.new(private_key)
+decrypted_session_key = decrypt_cipher.decrypt(encrypted_session_key)
+
+# 利用会话密钥加密数据
+data_cipher = PKCS1_OAEP.new(session_key)
+encrypted_message = data_cipher.encrypt(message)
+
+# 网站服务端解密数据
+decrypted_message = data_cipher.decrypt(encrypted_message)
+
+print("加密后的消息：", encrypted_message)
+print("解密后的消息：", decrypted_message)
+</code></pre>
+<p>在上面的代码中，我们模拟了网站端生成RSA密钥对，浏览器端生成会话密钥并使用网站的公钥进行加密，然后网站端使用私钥解密得到会话密钥，并利用会话密钥对消息进行加密和解密的过程。虽然这只是简单的模拟，但可以帮助理解网页加密的基本原理。在实际应用中还需要结合真实的加密库和证书来保护网页传输的安全。</p>
+<h2 id="ca认证中心"><a class="header" href="#ca认证中心">CA认证中心</a></h2>
+<h3 id="起源-1"><a class="header" href="#起源-1">起源</a></h3>
+<p>CA（Certificate Authority）数字认证中心，起源于公钥基础设施（PKI）的概念，最早可以追溯到1990年代。在网络通信中，PKI用于确保通信双方的身份验证、数据加密和签名的过程中。CA数字认证中心作为PKI的核心组成部分，负责颁发数字证书、管理密钥、验证身份等。</p>
+<h3 id="发展-1"><a class="header" href="#发展-1">发展</a></h3>
+<p>随着互联网的快速发展，CA数字认证中心变得越来越重要。各种网站、应用程序、电子商务平台等需要使用数字证书来保证用户数据的安全性和隐私保护。CA数字认证中心经历了不断的发展和完善，确保数字证书的可信性和安全性。</p>
+<h3 id="原理-1"><a class="header" href="#原理-1">原理</a></h3>
+<p>CA数字认证中心的原理是通过数字证书颁发机构来验证个体或组织的身份，并签发相应的数字证书。数字证书包括个体或组织的公钥和相关身份信息，由CA数字认证中心签名保证其可信性。在通信过程中，双方可以通过验证数字证书的有效性来确认对方的身份，并建立安全的通信通道。</p>
+<h3 id="典型认证中心"><a class="header" href="#典型认证中心">典型认证中心</a></h3>
+<ol>
+<li>
+<p>VeriSign：作为全球最大的CA数字认证中心之一，VeriSign在互联网安全领域有着较高的声誉。它颁发各种类型的数字证书，包括SSL证书、代码签名证书等。</p>
+</li>
+<li>
+<p>Comodo：Comodo是一家知名的全球CA数字认证中心，拥有庞大的数字证书颁发网络。它提供多种类型的数字证书服务，广泛应用于企业网络、电子商务平台等领域。</p>
+</li>
+<li>
+<p>Symantec：作为全球网络安全领域的领军企业之一，Symantec的CA数字认证中心致力于提供安全可靠的数字证书服务。它的数字证书被广泛应用于各种互联网和移动应用场景中。</p>
+</li>
+</ol>
+<h2 id="数字签名实战"><a class="header" href="#数字签名实战">数字签名实战</a></h2>
+<h3 id="python"><a class="header" href="#python">Python</a></h3>
+<p>要使用Python实现数字签名，可以使用Python中的cryptography库。以下是一个示例代码，演示如何使用RSA算法对消息进行数字签名和验证：</p>
+<pre><code class="language-python">from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives.asymmetric import rsa, padding
+from cryptography.hazmat.primitives import hashes
+
+# 生成RSA密钥对
+private_key = rsa.generate_private_key(
+    public_exponent=65537,
+    key_size=2048,
+)
+
+public_key = private_key.public_key()
+
+# 消息
+message = b"天上地下，唯我独尊!"
+
+# 对消息进行签名
+signature = private_key.sign(
+    message,
+    padding.PSS(
+        mgf=padding.MGF1(hashes.SHA256()),
+        salt_length=padding.PSS.MAX_LENGTH
+    ),
+    hashes.SHA256()
+)
+
+# 验证签名
+try:
+    public_key.verify(
+        signature,
+        message,
+        padding.PSS(
+            mgf=padding.MGF1(hashes.SHA256()),
+            salt_length=padding.PSS.MAX_LENGTH
+        ),
+        hashes.SHA256()
+    )
+    print("验证成功，消息未被篡改！")
+except:
+    print("验证失败，消息已被篡改！")
+</code></pre>
+<p>以上代码生成了一个RSA密钥对，使用私钥对消息进行签名，然后使用公钥验证签名的有效性。在验证过程中，如果签名有效，将输出“验证成功，消息未被篡改！”；如果签名无效，将输出“验证失败，消息已被篡改！”。</p>
+<h3 id="java"><a class="header" href="#java">Java</a></h3>
+<p>生成数字签名并校验</p>
+<pre><code class="language-java">package com.TianHan;
+
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.util.Base64;
+import javax.crypto.Cipher;
+import java.io.File;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
+import java.security.*;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+
+import org.apache.commons.io.FileUtils;
+
+public class DigitalSignatureDemo {
+    public static void main(String[] args) throws Exception {
+
+        String plainText = "时日曷丧，吾与汝皆亡。";
+        String path = "./code/src/main/resources/";
+        // 加密算法
+        String algorithm = "RSA";
+        // 从文件读取私钥 ，这个是自定义的方法
+        PrivateKey privateKey = getPrivateKey(path + "a.pri", algorithm);
+        PublicKey publicKey = getPublicKey(path + "a.pub", algorithm);
+
+        // 数字签名
+        String signatureAlgorithm = "SHA256withRSA";
+
+        // Sign the plain text with the private key
+        String hashedSignature = getHashedSignature(plainText, signatureAlgorithm, privateKey);
+        //System.out.println("Hashed Signature: " + hashedSignature);
+        boolean isVerified = verifySignature(plainText, signatureAlgorithm, publicKey, hashedSignature);
+        System.out.println("Signature verified: " + isVerified);
+    }
+
+
+    /**
+     * 生成签名
+     *
+     * @param plainText      : 原文
+     * @param algorithm  : 算法
+     * @param privateKey : 私钥
+     * @return : 签名
+     */
+
+    private static String getHashedSignature(String plainText, String algorithm, PrivateKey privateKey) throws Exception {
+        // TODO: Implement the digital signature algorithm
+        // Use the private key to sign the plain text and return the hashed signature
+        //获取签名对象
+        Signature signature = Signature.getInstance(algorithm);
+        //初始化签名对象
+        signature.initSign(privateKey);
+        //更新签名数据
+        signature.update(plainText.getBytes());
+        //生成签名
+        byte[] signedBytes = signature.sign();
+
+        //返回签名字符串
+        return Base64.getEncoder().encodeToString(signedBytes);
+    }
+
+    /**
+     * 校验签名
+     *
+     * @param plainText      : 原文
+     * @param algorithm      : 算法
+     * @param publicKey      : 公钥
+     * @param hashedSignature : 签名
+     * @return : 数据是否被篡改
+     */
+    private static boolean verifySignature(String plainText, String algorithm, PublicKey publicKey, String hashedSignature)throws Exception {
+        // 获取签名对象
+        Signature signature = Signature.getInstance(algorithm);
+        // 初始化签名
+        signature.initVerify(publicKey);
+        // 传入原文
+        signature.update(plainText.getBytes());
+        // 校验数据，验证自己活得的签名和传入的签名是否匹配
+        return signature.verify(Base64.getDecoder().decode(hashedSignature));
+
+    }
+
+
+    public static PublicKey getPublicKey(String publicPath, String algorithm) throws Exception {
+        // 将文件内容转为字符串
+        String publicKeyString = FileUtils.readFileToString(new File(publicPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        X509EncodedKeySpec spec = new X509EncodedKeySpec(Base64.getDecoder().decode(publicKeyString));
+        // 生成公钥
+        return keyFactory.generatePublic(spec);
+    }
+
+    public static PrivateKey getPrivateKey(String priPath, String algorithm) throws Exception {
+        // 将文件内容转为字符串
+        String privateKeyString = FileUtils.readFileToString(new File(priPath), Charset.defaultCharset());
+        // 获取密钥工厂
+        KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
+        // 构建密钥规范 进行Base64解码
+        PKCS8EncodedKeySpec spec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(privateKeyString));
+        // 生成私钥
+        return keyFactory.generatePrivate(spec);
+    }
+
+    /**
+     * 生成密钥对并保存在本地文件中
+     *
+     * @param algorithm : 算法
+     * @param pubPath   : 公钥保存路径
+     * @param priPath   : 私钥保存路径
+     * @throws Exception
+     */
+    private static void generateKeyToFile(String algorithm, String pubPath, String priPath) throws Exception {
+        //  创建密钥对生成器对象
+        KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(algorithm);
+        // 生成密钥对
+        KeyPair keyPair = keyPairGenerator.generateKeyPair();
+        // 生成私钥
+        PrivateKey privateKey = keyPair.getPrivate();
+        // 生成公钥
+        PublicKey publicKey = keyPair.getPublic();
+        // 获取私钥字节数组
+        byte[] privateKeyEncoded = privateKey.getEncoded();
+        // 获取公钥字节数组
+        byte[] publicKeyEncoded = publicKey.getEncoded();
+        // 对公私钥进行base64编码
+        String privateKeyString = Base64.getEncoder().encodeToString(privateKeyEncoded);
+        String publicKeyString = Base64.getEncoder().encodeToString(publicKeyEncoded);
+        // 保存文件
+
+        FileUtils.writeStringToFile(new File(pubPath), publicKeyString, StandardCharsets.UTF_8);
+        FileUtils.writeStringToFile(new File(priPath), privateKeyString, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * 解密数据
+     *
+     * @param algorithm : 算法
+     * @param encrypted : 密文
+     * @param key       : 密钥
+     * @return : 原文
+     * @throws Exception
+     */
+    public static String decryptRSA(String algorithm, Key key, String encrypted) throws Exception {
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 私钥进行解密
+        cipher.init(Cipher.DECRYPT_MODE, key);
+        // 由于密文进行了Base64编码, 在这里需要进行解码
+        byte[] decode = Base64.getDecoder().decode(encrypted);
+        // 对密文进行解密，不需要使用base64，因为原文不会乱码
+        byte[] bytes1 = cipher.doFinal(decode);
+        //System.out.println(new String(bytes1));
+        return new String(bytes1);
+
+    }
+
+    /**
+     * 使用密钥加密数据
+     *
+     * @param algorithm : 算法
+     * @param input     : 原文
+     * @param key       : 密钥
+     * @return : 密文
+     * @throws Exception
+     */
+    public static String encryptRSA(String algorithm, Key key, String input) throws Exception {
+        // 创建加密对象
+        // 参数表示加密算法
+        Cipher cipher = Cipher.getInstance(algorithm);
+        // 初始化加密
+        // 第一个参数:加密的模式
+        // 第二个参数：使用私钥进行加密
+        cipher.init(Cipher.ENCRYPT_MODE, key);
+        // 私钥加密
+        byte[] bytes = cipher.doFinal(input.getBytes());
+        // 对密文进行Base64编码
+        //System.out.println(Base64.getEncoder().encodeToString(bytes));
+        return Base64.getEncoder().encodeToString(bytes);
+    }
+}
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="非对称加密算法.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="隐写术.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="非对称加密算法.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="隐写术.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

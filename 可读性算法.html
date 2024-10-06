@@ -3,7 +3,7 @@
     <head>
         <!-- Book generated using mdBook -->
         <meta charset="UTF-8">
-        <title>前言 - 信息安全</title>
+        <title>可读性算法 - 信息安全</title>
 
 
         <!-- Custom HTML head -->
@@ -88,7 +88,7 @@
 
         <nav id="sidebar" class="sidebar" aria-label="Table of contents">
             <div class="sidebar-scrollbox">
-                <ol class="chapter"><li class="chapter-item expanded "><a href="前言.html" class="active"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded affix "><li class="part-title">密码学</li><li class="chapter-item expanded "><a href="密码学发展史.html"><strong aria-hidden="true">2.</strong> 密码学发展史</a></li><li class="chapter-item expanded "><a href="可读性算法.html"><strong aria-hidden="true">3.</strong> 可读性算法</a></li><li class="chapter-item expanded "><a href="对称加密算法.html"><strong aria-hidden="true">4.</strong> 对称加密算法</a></li><li class="chapter-item expanded "><a href="消息摘要算法.html"><strong aria-hidden="true">5.</strong> 消息摘要算法</a></li><li class="chapter-item expanded "><a href="非对称加密算法.html"><strong aria-hidden="true">6.</strong> 非对称加密算法</a></li><li class="chapter-item expanded "><a href="数字签名和数字证书.html"><strong aria-hidden="true">7.</strong> 数字签名和数字证书</a></li><li class="chapter-item expanded "><a href="隐写术.html"><strong aria-hidden="true">8.</strong> 隐写术</a></li><li class="chapter-item expanded affix "><li class="part-title">区块链</li><li class="chapter-item expanded affix "><li class="part-title">Solidity</li><li class="chapter-item expanded affix "><li class="part-title">Toolkit</li></ol>
+                <ol class="chapter"><li class="chapter-item expanded "><a href="前言.html"><strong aria-hidden="true">1.</strong> 前言</a></li><li class="chapter-item expanded affix "><li class="part-title">密码学</li><li class="chapter-item expanded "><a href="密码学发展史.html"><strong aria-hidden="true">2.</strong> 密码学发展史</a></li><li class="chapter-item expanded "><a href="可读性算法.html" class="active"><strong aria-hidden="true">3.</strong> 可读性算法</a></li><li class="chapter-item expanded "><a href="对称加密算法.html"><strong aria-hidden="true">4.</strong> 对称加密算法</a></li><li class="chapter-item expanded "><a href="消息摘要算法.html"><strong aria-hidden="true">5.</strong> 消息摘要算法</a></li><li class="chapter-item expanded "><a href="非对称加密算法.html"><strong aria-hidden="true">6.</strong> 非对称加密算法</a></li><li class="chapter-item expanded "><a href="数字签名和数字证书.html"><strong aria-hidden="true">7.</strong> 数字签名和数字证书</a></li><li class="chapter-item expanded "><a href="隐写术.html"><strong aria-hidden="true">8.</strong> 隐写术</a></li><li class="chapter-item expanded affix "><li class="part-title">区块链</li><li class="chapter-item expanded affix "><li class="part-title">Solidity</li><li class="chapter-item expanded affix "><li class="part-title">Toolkit</li></ol>
             </div>
             <div id="sidebar-resize-handle" class="sidebar-resize-handle">
                 <div class="sidebar-resize-indicator"></div>
@@ -174,14 +174,118 @@
                 <div id="content" class="content">
                     <main>
                         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
-<h1 id="chapter-1"><a class="header" href="#chapter-1">Chapter 1</a></h1>
+<h1 id="可读性算法"><a class="header" href="#可读性算法">可读性算法</a></h1>
+<ul>
+<li><a href="#base64">Base64</a>
+<ul>
+<li><a href="#python-%E8%B0%83%E7%94%A8">Python 调用</a></li>
+<li><a href="#java-%E8%B0%83%E7%94%A8">Java 调用</a></li>
+<li><a href="#java%E4%B8%ADtostring%E5%92%8Cnew-string%E5%8C%BA%E5%88%AB">Java中toString()和new String()区别</a></li>
+</ul>
+</li>
+<li><a href="#base58">Base58</a>
+<ul>
+<li><a href="#python%E5%AE%9E%E7%8E%B0">Python实现</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="base64"><a class="header" href="#base64">Base64</a></h2>
+<p>Base64算法是一种用于将二进制数据转换为文本数据的编码方式。它由美国程序员Joe Simons在1973年创立，最初是用来将二进制数据以ASCII编码的形式传输到网络上。Base64 不是加密算法，是可读性算法，目的是提升数据的可读性。</p>
+<p>Base64算法的原理是将三个字节的输入数据按照一定的规则划分成四个6位的片段，然后将每个6位的片段转换为对应的Base64字符。最后再在末尾加上1-2个“=”符号，以保证编码后的数据长度为4的倍数。Base64算法的编码表是由大小写字母、数字和“+”、“/”符号组成。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20240911185148.png" alt="" /></p>
+<h3 id="python-调用"><a class="header" href="#python-调用">Python 调用</a></h3>
+<p>在Python中，可以使用base64模块来实现Base64算法的编码和解码。下面是一个示例代码：</p>
+<pre><code class="language-python">import base64
+
+# 将字符串编码为Base64
+text = "Hello, World!"
+encoded_text = base64.b64encode(text.encode('utf-8'))
+print(encoded_text)
+
+# 将Base64编码的字符串解码
+decoded_text = base64.b64decode(encoded_text).decode('utf-8')
+print(decoded_text)
+</code></pre>
+<p>以上代码中，首先将字符串“Hello, World!”编码为Base64格式的数据，然后再将其解码为原始字符串。通过使用base64模块，我们可以方便地在Python中进行Base64编码和解码的操作。</p>
+<h3 id="java-调用"><a class="header" href="#java-调用">Java 调用</a></h3>
+<p>要使用Base64编码和解码，在Java中可以使用java.util.Base64类。可以通过以下方法来导入Base64类：</p>
+<pre><code class="language-java">import java.util.Base64;
+</code></pre>
+<p>然后使用Base64编码和解码的例子如下：</p>
+<pre><code class="language-java">public class Base64Example {
+
+    public static void main(String[] args) {
+        String originalString = "Hello, World!";
+        
+        // 编码
+        String encodedString = Base64.getEncoder().encodeToString(originalString.getBytes());
+        System.out.println("Encoded string: " + encodedString);
+        
+        // 解码
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedString);
+        String decodedString = new String(decodedBytes);
+        System.out.println("Decoded string: " + decodedString);
+    }
+}
+</code></pre>
+<p>以上代码首先将原始字符串"Hello, World!"进行编码，然后再进行解码。最终输出结果如下：</p>
+<pre><code>Encoded string: SGVsbG8sIFdvcmxkIQ==
+Decoded string: Hello, World!
+</code></pre>
+<p>这样就实现了用Base64和Java对字符串进行加密和解密。</p>
+<h3 id="java中tostring和new-string区别"><a class="header" href="#java中tostring和new-string区别">Java中toString()和new String()区别</a></h3>
+<pre><code class="language-java">package code;
+
+import java.util.Base64;
+
+public class TestBase64 {
+    public static void main(String[] args) {
+
+        String str = "TU0jV0xBTiNVYys5bEdiUjZlNU45aHJ0bTdDQStBPT0jNjQ2NDY1Njk4IzM5OTkwMDAwMzAwMA==";
+
+        String rlt1 = new String(Base64.getDecoder().decode(str));//MM#WLAN#Uc+9lGbR6e5N9hrtm7CA+A==#646465698#399900003000
+
+        String rlt2 = Base64.getDecoder().decode(str).toString();//[B@1540e19d
+
+        System.out.println(rlt1);
+        System.out.println(rlt2);
+    }
+}
+</code></pre>
+<p>str.toString是调用了这个object对象的类的toString方法。一般是返回这么一个String：<code>[class name]@[hashCode]</code></p>
+<p>new String(str)是根据parameter是一个字节数组，使用java虚拟机默认的编码格式，将这个字节数组decode为对应的字符。若虚拟机默认的编码格式是ISO-8859-1，按照ascii编码表即可得到字节对应的字符。</p>
+<p>什么时候用什么方法呢？</p>
+<p>一般使用字符转码byte[]数组的时候使用new String()</p>
+<p>对象打印的时候使用toString()</p>
+<h2 id="base58"><a class="header" href="#base58">Base58</a></h2>
+<p>Base58算法是一种类似于Base64算法的编码方式，它也用于将二进制数据转换为文本数据。与Base64不同的是，Base58算法不包含容易产生混淆的字符，比如0(数字零)、O(大写字母O)、I(大写字母I)、l(小写字母L)，也不包含"+"和"/"符号。</p>
+<p>Base58算法通常用于生成易于阅读和书写的短链接、Bitcoin地址等。</p>
+<p>Base58算法没有明确的作者和起源，但最为人熟知的是由比特币的创始人中本聪设计并应用于比特币地址的生成。</p>
+<p>Base58算法的原理和Base64类似，将输入数据按照一定的规则划分成固定长度的片段，然后对每个片段进行编码转换为Base58字符。Base58算法的编码表通常是由除了易混淆字符外的58个字符组成。</p>
+<h3 id="python实现"><a class="header" href="#python实现">Python实现</a></h3>
+<p>在Python中，我们可以使用base58模块来实现Base58算法的编码和解码。以下是一个简单示例代码：</p>
+<pre><code class="language-python">from base58 import b58encode, b58decode
+
+# 将字符串编码为Base58
+text = "Hello, World!"
+encoded_text = b58encode(text.encode('utf-8'))
+print(encoded_text)
+
+# 将Base58编码的字符串解码
+decoded_text = b58decode(encoded_text).decode('utf-8')
+print(decoded_text)
+</code></pre>
+<p>通过使用base58模块，我们可以轻松地在Python中实现Base58算法的编码和解码操作。</p>
 
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
                         <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="密码学发展史.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
 
-                            <a rel="next prefetch" href="密码学发展史.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="对称加密算法.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -191,8 +295,11 @@
             </div>
 
             <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="密码学发展史.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
 
-                    <a rel="next prefetch" href="密码学发展史.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="对称加密算法.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>
