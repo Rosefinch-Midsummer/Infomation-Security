@@ -1,0 +1,356 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>比特币 - 信息安全</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">信息安全</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="比特币"><a class="header" href="#比特币">比特币</a></h1>
+<ul>
+<li><a href="#%E4%BD%95%E4%B8%BA%E6%AF%94%E7%89%B9%E5%B8%81">何为比特币？</a>
+<ul>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E7%89%B9%E7%82%B9">基本特点</a></li>
+<li><a href="#%E6%8A%80%E6%9C%AF%E5%9F%BA%E7%A1%80">技术基础</a></li>
+</ul>
+</li>
+<li><a href="#%E6%AF%94%E7%89%B9%E5%B8%81%E4%BB%8E%E4%BD%95%E8%80%8C%E6%9D%A5">比特币“从何而来？</a>
+<ul>
+<li><a href="#%E5%8F%91%E8%A1%8C%E6%9C%BA%E5%88%B6">发行机制</a></li>
+<li><a href="#%E6%AF%94%E7%89%B9%E5%B8%81%E7%9A%84%E7%89%B9%E7%82%B9">比特币的特点</a></li>
+</ul>
+</li>
+<li><a href="#%E8%BF%90%E8%A1%8C%E6%9C%BA%E5%88%B6">运行机制</a>
+<ul>
+<li><a href="#%E5%8C%BA%E5%9D%97%E9%93%BE">区块链</a>
+<ul>
+<li><a href="#%E5%8E%BB%E4%B8%AD%E5%BF%83%E5%8C%96%E7%94%B5%E5%AD%90%E8%AE%B0%E8%B4%A6%E7%B3%BB%E7%BB%9F">去中心化电子记账系统</a></li>
+</ul>
+</li>
+<li><a href="#%E5%B7%A5%E4%BD%9C%E9%87%8F%E8%AF%81%E6%98%8E%E6%8C%96%E7%9F%BF">工作量证明——挖矿</a></li>
+<li><a href="#%E5%BA%94%E7%94%A8%E5%B1%82">应用层</a></li>
+<li><a href="#%E6%BF%80%E5%8A%B1%E5%B1%82">激励层</a></li>
+<li><a href="#%E5%85%B1%E8%AF%86%E5%B1%82">共识层</a>
+<ul>
+<li><a href="#%E5%8F%8C%E8%8A%B1%E9%97%AE%E9%A2%98">“双花”问题</a></li>
+<li><a href="#51%E6%94%BB%E5%87%BB">51%攻击</a></li>
+<li><a href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E5%8C%BA%E5%9D%9710%E5%88%86%E9%92%9F%E5%8F%91%E5%B8%83%E4%B8%80%E6%AC%A1">为什么区块10分钟发布一次</a></li>
+<li><a href="#%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E5%8C%BA%E5%9D%97%E5%8F%91%E5%B8%83%E6%97%B6%E9%97%B4%E4%BF%9D%E6%8C%81%E5%9C%A810%E5%88%86%E9%92%9F">如何保证区块发布时间保持在10分钟</a></li>
+</ul>
+</li>
+<li><a href="#%E7%BD%91%E7%BB%9C%E5%B1%82">网络层</a></li>
+<li><a href="#%E6%95%B0%E6%8D%AE%E5%B1%82">数据层</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="何为比特币"><a class="header" href="#何为比特币">何为比特币？</a></h2>
+<p>比特币（Bitcoin）是世界上首个去中心化的数字货币，也被称为加密货币。它是一种基于密码学原理构建的货币形式，不依赖于任何中央机构或政府，而是由用户和矿工组成的全球性点对点网络运作。</p>
+<h3 id="基本特点"><a class="header" href="#基本特点">基本特点</a></h3>
+<ul>
+<li><strong>去中心化</strong>：比特币不受中央银行或政府的控制，交易记录在区块链上，每个参与者都可以拥有一份完整的交易记录副本。</li>
+<li><strong>匿名性</strong>：虽然比特币交易是公开的，但交易参与者的身份信息是匿名的，仅通过地址进行识别。</li>
+<li><strong>有限供应</strong>：比特币的总供应量被设定为2100万个，通过复杂的算法逐渐减少以控制通胀。</li>
+</ul>
+<h3 id="技术基础"><a class="header" href="#技术基础">技术基础</a></h3>
+<ul>
+<li><strong>区块链</strong>：比特币的交易记录在区块链上，这是一种不断增长的数据链，每个区块包含一批交易信息并通过密码学链接。</li>
+<li><strong>加密算法</strong>：比特币使用SHA-256哈希函数来确保数据的完整性和安全性。</li>
+<li><strong>数字签名</strong>：使用椭圆曲线数字签名算法（ECDSA）来验证交易的合法性。</li>
+</ul>
+<h2 id="比特币从何而来"><a class="header" href="#比特币从何而来">比特币“从何而来？</a></h2>
+<p>比特币的诞生源于2008年全球金融危机之后，人们对传统金融体系的不信任。中本聪（Satoshi Nakamoto），比特币的创始人，在2008年10月31日发布了比特币白皮书，提出了一个新的货币系统概念。</p>
+<h3 id="发行机制"><a class="header" href="#发行机制">发行机制</a></h3>
+<ul>
+<li><strong>挖矿</strong>：比特币通过一个称为“挖矿”的过程产生。矿工通过解决复杂的数学问题（工作量证明），竞争获取记账权，从而获得新产生的比特币作为奖励。</li>
+<li><strong>交易记录</strong>：每笔比特币交易都会被记录在区块链上，确保交易的透明度和不可篡改性。</li>
+</ul>
+<h3 id="比特币的特点"><a class="header" href="#比特币的特点">比特币的特点</a></h3>
+<ul>
+<li><strong>无需中介</strong>：比特币交易不需要银行或金融机构的参与，减少了交易费用和时间。</li>
+<li><strong>全球流通</strong>：比特币可以在任何地方流通，只要有网络连接，无国界限制。</li>
+</ul>
+<h2 id="运行机制"><a class="header" href="#运行机制">运行机制</a></h2>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20241015164411.png" alt="区块链结构图" /></p>
+<h3 id="区块链"><a class="header" href="#区块链">区块链</a></h3>
+<p>区块链是比特币的核心技术，每个区块包含一批交易信息，通过哈希链接在一起。区块的哈希值是区块唯一标识。</p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20241015164512.png" alt="区块结构" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20241015172917.png" alt="区块链工作原理" /></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20241015173146.png" alt="比特币交易过程" /></p>
+<h4 id="去中心化电子记账系统"><a class="header" href="#去中心化电子记账系统">去中心化电子记账系统</a></h4>
+<p><strong>问题：</strong></p>
+<ol>
+<li>
+<p><strong>账单以谁的为准？</strong> 当A和B同时交易时，如何确定交易顺序？</p>
+<ul>
+<li>解决方案：通过工作量证明机制（PoW），矿工竞赛决定记账顺序。</li>
+</ul>
+</li>
+<li>
+<p><strong>为什么要记账？</strong> 为什么要在自己电脑上记录别人的交易？</p>
+<ul>
+<li><strong>激励机制</strong>：记账有奖励：
+<ul>
+<li><strong>手续费</strong>：交易者支付一定的手续费给记录交易的矿工。</li>
+<li><strong>打包奖励</strong>：每10分钟打一个包，获得50个比特币的奖励，每4年减半。</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<p><strong>数学计算：</strong></p>
+<p><code>50∗6∗24∗365∗4∗[1+1/2+(1/2)^2+…]=2100万</code></p>
+<p>因此，运行区块链只需要准备2100万的打包奖励费用。</p>
+<h3 id="工作量证明挖矿"><a class="header" href="#工作量证明挖矿">工作量证明——挖矿</a></h3>
+<p><strong>哈希函数：</strong></p>
+<ul>
+<li>把任意长度的输入通过散列算法变换成固定长度（256位）的输出，常见的哈希算法是SHA256。</li>
+<li>哈希计算正向容易，反向计算困难至极。</li>
+</ul>
+<p><strong>原理：</strong></p>
+<p><img src="https://cdn.jsdelivr.net/gh/Rosefinch-Midsummer/MyImagesHost04/img/20241015165042.png" alt="工作量证明原理" /></p>
+<h3 id="应用层"><a class="header" href="#应用层">应用层</a></h3>
+<ul>
+<li><strong>钱包</strong>：比特币钱包用于存储用户的私钥和地址，管理交易。</li>
+<li><strong>交易</strong>：用户可以通过钱包发送和接收比特币。</li>
+</ul>
+<h3 id="激励层"><a class="header" href="#激励层">激励层</a></h3>
+<ul>
+<li><strong>挖矿奖励</strong>：比特币通过奖励给创建新区块的矿工的方式产生，奖励大约每四年减半。目前每10分钟产生一个新区块，奖励12.5个比特币给矿工。</li>
+<li><strong>交易费用</strong>：所有交易都需要支付手续费给记录区块的矿工，交易费不足的交易会被矿工拒绝。</li>
+</ul>
+<h3 id="共识层"><a class="header" href="#共识层">共识层</a></h3>
+<ul>
+<li><strong>拜占庭将军问题</strong>：在分布式网络中如何达成共识，避免少数节点作恶。</li>
+<li><strong>工作量证明机制</strong>（Proof of Work, POW）：通过竞赛解决数学难题，获取记账权。</li>
+<li><strong>挖矿</strong>：SHA256(SHA256(Version+HashPreBlock + Merkle_root + Timestamp + Bits + Nonce)) ≤ 难度目标Bits</li>
+</ul>
+<h4 id="双花问题"><a class="header" href="#双花问题">“双花”问题</a></h4>
+<p>如何保证每一笔数字现金只被花掉一次，避免重复支出？</p>
+<ul>
+<li><strong>解决方案</strong>：区块链为每一笔交易加入时间戳，使用UTXO模型。</li>
+</ul>
+<h4 id="51攻击"><a class="header" href="#51攻击">51%攻击</a></h4>
+<p>51%攻击并不能修改数据，但可以进行“双花”攻击。</p>
+<h4 id="为什么区块10分钟发布一次"><a class="header" href="#为什么区块10分钟发布一次">为什么区块10分钟发布一次</a></h4>
+<ul>
+<li><strong>原因</strong>：区块间隔时间短会导致交易少、浪费大、网络延迟影响大，容易分叉。</li>
+</ul>
+<h4 id="如何保证区块发布时间保持在10分钟"><a class="header" href="#如何保证区块发布时间保持在10分钟">如何保证区块发布时间保持在10分钟</a></h4>
+<ul>
+<li><strong>难度调整</strong>：每完成2016个块，根据出块平均时间调整一次难度。</li>
+</ul>
+<h3 id="网络层"><a class="header" href="#网络层">网络层</a></h3>
+<ul>
+<li><strong>P2P网络</strong>：点对点技术，没有中心服务器，依靠用户群交换信息，具有耐攻击、高容错的优点。</li>
+</ul>
+<h3 id="数据层"><a class="header" href="#数据层">数据层</a></h3>
+<ul>
+<li><strong>非对称加密</strong>：
+<ul>
+<li>公钥和私钥成对出现，公钥公开，私钥保密；</li>
+<li>私钥加密（签名）的信息只有对应的公钥才能解密（验签）；</li>
+<li>公钥加密的信息只有对应的私钥才能解密。</li>
+<li>公钥加密，私钥解密；</li>
+<li>私钥签名，公钥验签。</li>
+</ul>
+</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../Web3/区块链.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../Web3/智能合约.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../Web3/区块链.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../Web3/智能合约.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,463 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>智能合约 - 信息安全</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">信息安全</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="智能合约"><a class="header" href="#智能合约">智能合约</a></h1>
+<ul>
+<li><a href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6">什么是智能合约？</a></li>
+<li><a href="#%E5%8C%BA%E5%9D%97%E9%93%BE20-vs-%E5%8C%BA%E5%9D%97%E9%93%BE10">区块链2.0 VS 区块链1.0</a></li>
+<li><a href="#%E5%8C%BA%E5%9D%97%E9%93%BE%E9%97%AE%E9%A2%98">区块链问题</a></li>
+<li><a href="#%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E8%AF%AD%E8%A8%80">智能合约语言</a></li>
+<li><a href="#%E5%85%B1%E8%AF%86%E6%9C%BA%E5%88%B6">共识机制</a>
+<ul>
+<li><a href="#pos-vs-pow">PoS VS PoW</a></li>
+<li><a href="#%E5%85%B6%E4%BB%96%E5%85%B1%E8%AF%86%E6%9C%BA%E5%88%B6">其他共识机制</a></li>
+<li><a href="#%E5%A5%B3%E5%B7%AB%E6%94%BB%E5%87%BB">女巫攻击</a></li>
+</ul>
+</li>
+<li><a href="#%E6%99%BA%E8%83%BD%E5%90%88%E7%BA%A6%E4%B8%8Edapp">智能合约与DAPP</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E5%85%B7%E5%A4%8720%E7%89%B9%E6%80%A7%E7%9A%84%E5%8C%BA%E5%9D%97%E9%93%BE">常见具备2.0特性的区块链</a>
+<ul>
+<li><a href="#defi">Defi</a></li>
+<li><a href="#nft">NFT</a></li>
+</ul>
+</li>
+<li><a href="#%E4%BB%A5%E5%A4%AA%E5%9D%8A%E5%92%8Cmetamask">以太坊和Metamask</a>
+<ul>
+<li><a href="#%E6%89%98%E7%AE%A1%E9%92%B1%E5%8C%85%E5%92%8C%E8%87%AA%E6%89%98%E7%AE%A1%E9%92%B1%E5%8C%85">托管钱包和自托管钱包</a></li>
+<li><a href="#%E7%AD%BE%E5%90%8D%E5%8F%91%E9%80%81%E4%BA%A4%E6%98%93">签名&amp;发送交易</a></li>
+<li><a href="#%E7%87%83%E6%96%99%E8%B4%B9gas%E8%B4%B9%E4%BB%8B%E7%BB%8D">燃料费（gas费）介绍</a>
+<ul>
+<li><a href="#wei">Wei</a></li>
+<li><a href="#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%E8%A7%A3%E7%AD%94">常见问题解答</a></li>
+<li><a href="#dai-wei">Dai Wei</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h2 id="什么是智能合约"><a class="header" href="#什么是智能合约">什么是智能合约？</a></h2>
+<p>智能合约是一种基于区块链技术的自动化协议，它能够在满足预设条件时自动执行、验证或强制执行合同条款。虽然目前尚没有统一的明确定义，但智能合约的核心特点可以概括为以下几点：</p>
+<ul>
+<li><strong>事件驱动</strong>：智能合约的执行由特定事件触发，例如交易的发起或特定条件的满足。</li>
+<li><strong>状态管理</strong>：智能合约能够存储和管理状态信息，例如账户余额或合同条款的履行情况。</li>
+<li><strong>多方共识</strong>：智能合约运行在区块链上，所有参与方都认可其规则和执行结果。</li>
+<li><strong>自动化执行</strong>：智能合约通过预设的算法自动处理资产和交易，减少人为干预和仲裁的需求。</li>
+</ul>
+<p>智能合约的优势在于利用程序算法替代传统合同中的仲裁和执行过程，从而提高效率、降低成本，并减少人为错误和欺诈的可能性。</p>
+<p>智能合约（Smart Contract）是一种基于区块链技术的自动化合约，通过编程代码执行合同条款和交易条件。智能合约充当了合同的执行者，在满足特定条件时自动执行预设的操作，无需第三方中介的干预，确保了合同的自动化执行和可靠性。</p>
+<p>智能合约具有以下几个重要特点：</p>
+<ol>
+<li>
+<p>自动化执行：智能合约是以编程代码的形式编写而成，当特定条件满足时，合约会自动执行预定义的操作。这种自动化的执行方式大大简化了合同的执行流程，提高了效率。</p>
+</li>
+<li>
+<p>不可篡改性：一旦智能合约部署在区块链上，就无法篡改或修改，确保了合同条款的不可更改性，防止恶意操纵和第三方干预。</p>
+</li>
+<li>
+<p>透明性和信任：智能合约的所有代码和操作都被记录在区块链上，所有参与者都可以查看和验证。这种透明性增加了合同的信任度，并减少了争议的可能性。</p>
+</li>
+<li>
+<p>高安全性：智能合约采用密码学技术确保交易和数据的安全性，不易受到黑客攻击。只有满足特定条件的交易才能触发智能合约的执行。</p>
+</li>
+<li>
+<p>去中心化：智能合约在区块链上执行，无需中间人或第三方干预，实现了去中心化的交易和合约执行模式。</p>
+</li>
+</ol>
+<p>智能合约在各个领域具有广泛应用，包括金融、供应链管理、投资、保险、不动产等。例如，可以用智能合约实现无需第三方的去中心化交易、自动化的供应链管理、投资基金的管理和分配等。以太坊是一个支持智能合约的区块链平台，开发者可以在其上编写和部署智能合约，推动区块链技术在各个行业的应用和创新。</p>
+<h2 id="区块链20-vs-区块链10"><a class="header" href="#区块链20-vs-区块链10">区块链2.0 VS 区块链1.0</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>特性</th><th>区块链2.0</th><th>区块链1.0</th></tr></thead><tbody>
+<tr><td><strong>图灵完备性</strong></td><td>支持图灵完备的编程语言，能够执行复杂逻辑</td><td>非图灵完备，只能执行有限类型的指令</td></tr>
+<tr><td><strong>智能合约</strong></td><td>支持智能合约，实现自动化合同执行</td><td>不支持智能合约，仅支持简单交易</td></tr>
+<tr><td><strong>应用定位</strong></td><td>定位于平台，支持多种应用开发</td><td>定位于特定应用，如支付网络</td></tr>
+</tbody></table>
+</div>
+<h2 id="区块链问题"><a class="header" href="#区块链问题">区块链问题</a></h2>
+<p>尽管区块链技术具有许多优势，但它也面临一些挑战：</p>
+<ul>
+<li><strong>效率低和确认时间长</strong>：区块链网络的交易处理速度较慢，尤其是在比特币网络中，确认时间可能长达数分钟甚至数小时。</li>
+<li><strong>高耗能问题</strong>：工作量证明（PoW）机制需要大量的计算资源，导致能源消耗巨大。</li>
+<li><strong>技术性能问题</strong>：区块链的可扩展性和吞吐量有限，难以应对大规模应用需求。</li>
+<li><strong>安全性问题</strong>：虽然区块链本身具有较高的安全性，但智能合约和外部接口可能存在漏洞，导致攻击风险。</li>
+</ul>
+<p>例如，在单机环境下，实现功能是主要目标，而在分布式环境下，如何解决一致性问题成为关键。区块链技术通过分布式账本和共识机制解决了这一问题，而智能合约则是实现这一目标的核心工具。</p>
+<h2 id="智能合约语言"><a class="header" href="#智能合约语言">智能合约语言</a></h2>
+<p>比特币脚本语言是一种简单的智能合约语言，它实现了安全的数字货币计算模型，确保在无需第三方的情况下进行价值转移。然而，现实世界的需求非常复杂，比特币脚本语言无法满足多样化的应用场景。因此，以太坊等区块链平台引入了图灵完备的智能合约语言，如Solidity。</p>
+<p>图灵完备的语言能够实现所有可计算的功能，支持循环和复杂逻辑。为了避免程序陷入死循环，以太坊引入了“gas”机制，每个操作都会消耗一定的gas，从而限制程序的执行时间和资源消耗。</p>
+<h2 id="共识机制"><a class="header" href="#共识机制">共识机制</a></h2>
+<p>区块链2.0支持多种无资源消耗的共识机制，如POS（权益证明）、DPOS（委托权益证明）和PBFT（实用拜占庭容错）。这些机制具有以下优点：</p>
+<ul>
+<li><strong>节省资源</strong>：不需要大量算力挖矿，减少能源消耗。</li>
+<li><strong>提高交易速度</strong>：以太坊采用POS共识机制后，交易确认时间缩短至秒级。</li>
+</ul>
+<p>然而，这些共识机制也存在一些缺点：</p>
+<ul>
+<li><strong>PBFT</strong>：无法防范女巫攻击，不适合公有链，但性能较好。</li>
+<li><strong>POS和DPOS</strong>：需要代币参与，限制了其在行业应用中的适用性。</li>
+</ul>
+<h3 id="pos-vs-pow"><a class="header" href="#pos-vs-pow">PoS VS PoW</a></h3>
+<p>以太坊的PoS（Proof of Stake）共识机制和比特币的PoW（Proof of Work）共识机制是两种不同的区块链共识机制，它们分别采用不同的方式来确保区块链网络的安全性和可靠性。</p>
+<ol>
+<li>
+<p>以太坊的PoS（Proof of Stake）共识机制：
+以太坊正在计划过渡至PoS共识机制，以提高网络的可扩展性和效率。在PoS共识机制下，区块链网络的确认和验证工作由具有一定数量代币的持有者来完成，持有代币的数量越多，参与确认和验证的机会就越大。持有代币的节点（称为验证者）根据其持有的代币数量被选中来创建新的区块，并获得相应的奖励。PoS共识机制不需要繁重的计算工作，因此能够降低能源消耗，并提高网络的效率。</p>
+</li>
+<li>
+<p>比特币的PoW（Proof of Work）共识机制：
+比特币使用的是PoW共识机制，即通过解决复杂的密码学难题（称为工作量证明）来确认并创建新的区块。矿工利用计算力来解决难题，第一个解出难题的矿工将获得相应的奖励。PoW共识机制需要消耗大量的能源和算力，来确保网络的安全性和不可篡改性。</p>
+</li>
+</ol>
+<p>异同点：</p>
+<ol>
+<li>
+<p>异同之一是PoS共识机制更加节能高效，因为不需要进行大量的计算来解决难题，而PoW共识机制消耗大量能源。这是由于PoS是根据验证者持有的代币数量来进行验证，而PoW是通过大量计算来争夺记账权。</p>
+</li>
+<li>
+<p>另一个不同之处是PoS共识机制可以提高网络的可扩展性，减少了产生分叉的可能性，而PoW共识机制可能会导致网络的分叉。</p>
+</li>
+<li>
+<p>共同之处是两种共识机制都致力于确保网络的安全性和不可篡改性，只是实现的方式有所不同。</p>
+</li>
+</ol>
+<p>总的来说，以太坊的PoS和比特币的PoW共识机制各有优势和劣势，选择使用哪种共识机制取决于具体的需求和目标。两种共识机制的发展都有助于推动区块链技术在各个领域的应用和创新。</p>
+<h3 id="其他共识机制"><a class="header" href="#其他共识机制">其他共识机制</a></h3>
+<p>除了PoW（Proof of Work）和PoS（Proof of Stake）这两种常见的共识机制，区块链技术还涌现了多种其他类型的共识机制，每种共识机制都有其独特的特点和适用场景。以下是一些其他常见的区块链共识机制：</p>
+<ol>
+<li>
+<p>Proof of Authority（PoA）：PoA共识机制是一种基于身份验证的共识机制，其中网络的验证者是经过认证的特定实体或个人。验证者被授予参与网络确认和验证的权限，而不是通过计算力或代币持有来获得权益。PoA共识机制通常被用于企业或私有区块链网络中，以确保网络的安全性和可靠性。</p>
+</li>
+<li>
+<p>Delegated Proof of Stake（DPoS）：DPoS共识机制是一种代理式的权益证明机制，持有代币的用户可以通过投票选举出代表来确认和验证区块链上的交易。选举出的代表会产生新的区块，获得相应的奖励。DPoS机制可以提高效率和可扩展性，被一些公共区块链项目（如EOS）采用。</p>
+</li>
+<li>
+<p>Proof of Burn（PoB）：PoB共识机制是指参与者需要“烧毁”（即将代币发送到一个无法再次访问的地址）一定数量的代币，作为获得记账权和权益的证明。PoB机制旨在减少代币的供应量，并鼓励长期持有者参与网络维护。</p>
+</li>
+<li>
+<p>Proof of Capacity（PoC）：PoC共识机制是一种与硬盘空间相关的共识机制，参与者必须证明拥有一定数量的硬盘空间用于存储区块链数据。PoC机制被用于一些存储类区块链项目，可以降低能源消耗并提高效率。</p>
+</li>
+<li>
+<p>Proof of Elapsed Time（PoET）：PoET共识机制是由英特尔开发的一种共识算法，基于随机等待时间来选择下一个产生区块的节点。PoET通过在物理随机性上保证公平性，被广泛应用于一些企业级联盟链项目中。</p>
+</li>
+</ol>
+<p>这些不同类型的共识机制各有特点和适用场景，可以根据具体的需求和情况选择最合适的共识机制。区块链技术的不断发展和创新也会促进更多共识机制的出现，推动区块链在各个领域的广泛应用和实践。</p>
+<h3 id="女巫攻击"><a class="header" href="#女巫攻击">女巫攻击</a></h3>
+<p>在区块链领域，女巫攻击（Sybil Attack）是一种恶意行为，其中攻击者通过创建大量虚假身份（也称为Sybil节点）来控制或破坏网络。这种攻击方式得名于美国精神分裂症患者Sybil Dorsett。</p>
+<p>女巫攻击的目的通常是操纵网络中的投票过程、破坏共识机制或欺骗其他参与者。攻击者通过创建大量虚假身份，在网络中生成大量虚假交易或事件，以扭曲真实数据、干扰网络运作、窃取信息等方式达到其不良目的。</p>
+<p>女巫攻击在去中心化的区块链系统中特别危险，因为区块链的核心设计理念是去中心化和信任，攻击者一旦控制大部分网络节点，就可以破坏系统的正常运行，篡改交易记录，甚至发动双重支付等恶意行为。</p>
+<p>为了防范女巫攻击，区块链系统通常采取以下措施：</p>
+<ol>
+<li>
+<p>Proof of Work（PoW）和Proof of Stake（PoS）等共识机制：这些共识机制通过要求节点提供计算能力或代币权益等资源来获得记账权，从而限制了攻击者创建大量虚假身份的成本，降低了女巫攻击的风险。</p>
+</li>
+<li>
+<p>身份验证和信任度系统：在某些区块链项目中，采用身份验证和信任度系统来确保网络中节点的身份和行为真实有效，防范女巫攻击。</p>
+</li>
+<li>
+<p>去中心化设计和多重验证：采用去中心化的设计和多重验证机制，确保网络中没有单一实体或节点能够轻易控制整个网络，避免女巫攻击的发生。</p>
+</li>
+</ol>
+<p>女巫攻击是区块链领域中的一种常见攻击方式，对系统的安全性和可靠性构成严重威胁。因此，开发者和研究人员需要不断改进和加强区块链系统的安全机制，防范和应对各种潜在攻击。</p>
+<h2 id="智能合约与dapp"><a class="header" href="#智能合约与dapp">智能合约与DAPP</a></h2>
+<p>智能合约相当于服务器后台，而DAPP（去中心化应用）则是通过前端页面与用户交互的应用。通过RPC接口，DAPP可以与智能合约进行通信，实现完整的去中心化功能。以太坊节点程序Geth在8545端口提供了JSON RPC API，支持Web3库的命令，为前端应用提供区块链数据。</p>
+<h2 id="常见具备20特性的区块链"><a class="header" href="#常见具备20特性的区块链">常见具备2.0特性的区块链</a></h2>
+<ul>
+<li><strong>以太坊</strong>：2015年正式发布，拥有丰富的用户和应用生态。</li>
+<li><strong>Hyperledger</strong>：企业级区块链平台，由Linux基金会管理。</li>
+<li><strong>LISK</strong>：2016年6月发布，用户和应用较少，但具有潜力。</li>
+<li><strong>Fabric</strong>：由IBM主导的企业级区块链框架，支持模块化设计和隐私保护。</li>
+</ul>
+<h3 id="defi"><a class="header" href="#defi">Defi</a></h3>
+<p>DeFi（Decentralized Finance）是区块链技术和智能合约技术相结合的一种金融服务模式，旨在通过去中心化的方式提供传统金融服务。DeFi在去中心化的区块链网络上运行，不依赖于传统金融机构，通过智能合约实现各种金融服务和交易活动。</p>
+<p>智能合约在DeFi中扮演着关键的角色，通过智能合约编程实现了自动化的金融服务，如借贷、交易、投资、支付、预测市场等。DeFi使得任何人都可以参与各种金融活动，无需信任第三方中介，享受更低成本、更高效率和更易访问的金融服务。</p>
+<p>DeFi涉及的应用和服务非常广泛，包括但不限于以下几种：</p>
+<ol>
+<li>
+<p>借贷平台：用户可以通过抵押数字资产来借款，或者提供数字资产赚取利息，实现点对点的借贷服务，如Compound、Aave等。</p>
+</li>
+<li>
+<p>去中心化交易所（DEX）：用户可以直接在去中心化交易所上进行数字资产交易，无需传统交易所的中介，如Uniswap、SushiSwap等。</p>
+</li>
+<li>
+<p>保险平台：提供去中心化的智能合约保险服务，保障用户数字资产的安全，如Nexus Mutual等。</p>
+</li>
+<li>
+<p>预测市场：允许用户在去中心化平台上进行各种事件的预测和交易，如Augur、Polymarket等。</p>
+</li>
+<li>
+<p>合成资产：发行和交易抵押实物资产的数字化衍生品，如合成黄金、股票等资产。</p>
+</li>
+</ol>
+<p>DeFi在近年来得到了快速发展和广泛关注，为区块链技术的应用提供了重要的示范和创新模式。然而，DeFi市场仍面临着许多挑战，如智能合约漏洞、安全性风险等问题，需要加强监管和技术进步以确保DeFi的可持续发展。</p>
+<h3 id="nft"><a class="header" href="#nft">NFT</a></h3>
+<p>NFT（Non-Fungible Token）是指非同质化代币，是一种在区块链上发行的数字资产标准，每一个NFT都具有唯一性和不可替代性。NFT利用智能合约技术，将数字资产（如艺术品、游戏道具、音频、视频、虚拟地产等）的所有权和身份信息记录在区块链上，实现了数字资产的唯一性和真实性。</p>
+<p>与传统的加密货币（如比特币、以太币等）不同，NFT代表的是唯一的数字资产，每一个NFT都具有独特的标识信息，不可互换或替代。这使得NFT在数字艺术、虚拟世界、收藏品、游戏等领域具有广泛的应用场景。持有NFT的用户可以证明自己拥有特定的数字资产，并在区块链上追溯该资产的所有历史记录。</p>
+<p>NFT的发展也推动了虚拟资产经济的发展，为数字内容创作者、艺术家和游戏开发者提供了新的数字化作品展示、销售和收益模式。通过NFT，他们可以将自己的作品售卖为独有的数字艺术品，实现数字资产的有效管理、交易和分发。</p>
+<p>总的来说，NFT是智能合约技术在数字资产领域的一种重要应用形式，为数字资产的所有权和交易提供了更加透明、安全、不可篡改的解决方案，推动了数字资产领域的进一步发展和创新。</p>
+<h1 id="以太坊和metamask"><a class="header" href="#以太坊和metamask">以太坊和Metamask</a></h1>
+<p><a href="https://ethereum.org/zh/">以太坊官网</a></p>
+<p><a href="https://metamask.io/">Metamask钱包简介</a></p>
+<h2 id="托管钱包和自托管钱包"><a class="header" href="#托管钱包和自托管钱包">托管钱包和自托管钱包</a></h2>
+<ul>
+<li><a href="https://learn.metamask.io/zh-CN/lessons/what-is-a-crypto-wallet">什么是加密钱包</a></li>
+<li><a href="https://learn.metamask.io/zh-CN/lessons/what-is-a-self-custody-wallet">什么是自主托管</a></li>
+</ul>
+<p>托管钱包是由第三方提供和维护的数字货币钱包。用户在使用托管钱包时，将私钥交由第三方管理，而不是用户自己保存私钥。用户可以通过第三方托管服务方便地管理和交易数字货币，同时也需要信任第三方保护私钥的安全。</p>
+<p>自托管钱包是用户自己保存和管理私钥的数字货币钱包。用户需要自行保管私钥并确保其安全性，可以选择将私钥保存在硬件钱包、纸钱包、桌面钱包或移动钱包中。自托管钱包具有更高的安全性和隐私性，用户拥有对私钥的完全控制权，并不依赖于第三方服务。</p>
+<p>自托管钱包和托管钱包各有优缺点，用户可以根据自己的需求和风险承受能力选择适合自己的钱包形式。托管钱包适合那些对私钥管理不熟悉或不愿意自行管理私钥的用户，而自托管钱包适合那些更注重安全性和隐私性的用户。</p>
+<p>MetaMask 是领先的自动托管钱包。 访问区块链应用程序和 web3 的安全简便方式。 深受全球数百万用户的信赖。</p>
+<h2 id="签名发送交易"><a class="header" href="#签名发送交易">签名&amp;发送交易</a></h2>
+<ul>
+<li><a href="https://blog.csdn.net/weixin_43586667/article/details/122766815">椭圆曲线签名算法</a></li>
+<li><a href="https://andersbrownworth.com/">签名模拟</a></li>
+</ul>
+<h2 id="燃料费gas费介绍"><a class="header" href="#燃料费gas费介绍">燃料费（gas费）介绍</a></h2>
+<ul>
+<li><a href="https://ethereum.org/zh/developers/docs/gas">gas费介绍</a></li>
+<li><a href="https://ethereum.org/zh/developers/docs/gas#what-was-the-london-upgrade-eip-1559">EIP-1559</a></li>
+</ul>
+<p>Gas Limit是指每个区块中可以包含的Gas总量的上限，Gas Price是指每个Gas的价格，Wei是以太坊中的最小货币单位。</p>
+<p>Gas是以太坊区块链中用于衡量交易和合约执行成本的单位，类似于燃料。Gas Limit是指交易或合约执行最多可以消耗的Gas数量，Gas Price是指每个Gas的价格，通过Gas Price和Gas Limit可以确定一个交易的手续费。</p>
+<h3 id="wei"><a class="header" href="#wei">Wei</a></h3>
+<p>Wei是以太坊中的最小货币单位，用来支付以太坊网络中的各种费用，包括Gas费用。</p>
+<p>首先我们来看一下以太币单位之间的转换，以太币的最小单位为wei，1个eth相当于10的18次方wei。通常，大家也使用Gwei作为展示单位。比较常用的就是eth，Gwei和wei。</p>
+<p>在以太坊世界中，Wei 是一个关键概念，它是这个区块链网络中最小的以太单位。随着加密货币的普及，理解各种面值变得至关重要，以实现在以太坊生态系统内的无缝交易和互动。让我们深入探讨 Wei 和它在加密货币领域的重要性。</p>
+<p>Wei 的名字是以密码学家 Wei Dai 命名的，它代表了以太坊网络的基本构建块。换句话说，10 亿个 Wei 相当于一个以太币。随着以太币的价值波动，Wei 充当了基本单位，促进微小交易，并使用户能够交易这种受欢迎的加密货币的最小分数。</p>
+<p>II. Wei 的面值</p>
+<p>在探索以太坊网络复杂的面值结构时，我们发现 Wei 可以进一步细分为更小的单位，每个单位都有独特的用途。其中包括 Kwei、Mwei、Gwei 等等。然而，Gwei 因其实用性和易用性而受到了广泛的欢迎和采用。</p>
+<p>III. 什么是 Gwei</p>
+<p>Gwei，即 Gigawei 的缩写，表示 10 亿个 Wei 单位。换句话说，一个 Gwei 等于十亿个 Wei。以太坊网络主要在处理燃气费时使用 Gwei 作为单位选择。对于那些不熟悉的人来说，燃气费是在以太坊区块链上执行智能合约或任何其他交易时产生的费用。</p>
+<p>随着 2021 年以太坊费用机制的改革，用户现在在燃气费计算方面体验到了更大的透明度和可预测性。这些费用确保网络的安全性，并激励矿工验证交易并维护区块链。</p>
+<p>IV. Wei 转换为 Gwei</p>
+<p>在 Wei 和 Gwei 之间进行转换是一个简单的过程。要将一定数量的 Wei 转换为 Gwei，只需将给定的数量除以十亿。例如，如果你有 420,069,000,000 Wei，将它除以 10 亿，得到 420.069 Gwei。</p>
+<p>V. Wei 转换为以太币</p>
+<p>除了将 Wei 转换为 Gwei，还了解如何将 Wei 转换为更常见的以太币也是很重要的。要做到这一点，将 Wei 的数量除以 10^18，这是一个重要的数字，因为一个以太币由 100,000,000,000,000,000 个 Wei 组成。举个例子，如果你拥有 100 万亿个 Wei，将其除以 10^18 将得到 0.0001 以太币。</p>
+<p>VI. 代码中的 Wei 转换为以太币</p>
+<p>对于开发人员，通过 Chainbase SDK 的 formatEther 方法轻松地将 Wei 转换为以太币。通过使用这种方法，你可以轻松地从特定地址获取余额，然后将其格式化为以太币。这种方便高效的方法简化了各种基于以太坊的应用和服务，提升了整个网络中的用户体验。</p>
+<p>总之，Wei 和 Gwei 是以太坊生态系统的关键组成部分，使用户能够进行精确高效的加密货币交易。随着以太坊网络的不断发展，理解这些面值对于普通用户和开发人员来说变得越来越重要。</p>
+<h3 id="常见问题解答"><a class="header" href="#常见问题解答">常见问题解答</a></h3>
+<ol>
+<li>在以太坊中，Wei 的重要性是什么？</li>
+</ol>
+<p>Wei 代表以太坊网络中最小的 Ether 单位，这对于进行微小交易和精确价值转移至关重要。</p>
+<ol start="2">
+<li>谁是 Wei Dai，为什么 Wei 以他的名字命名？</li>
+</ol>
+<p>Wei Dai 是一位著名的密码学家，以他在密码学领域的贡献而闻名。以太币的最小单位 Wei 是以他的名字命名的。</p>
+<ol start="3">
+<li>为什么 Gwei 是以太坊中最常用的单位？</li>
+</ol>
+<p>Gwei，即 Gigawei 的缩写，因其在计算燃气费时的实用性而在以太坊中广泛使用和采纳。</p>
+<ol start="4">
+<li>如何将 Wei 转换为 Gwei？</li>
+</ol>
+<p>要将 Wei 转换为 Gwei，将 Wei 的数量除以十亿。例如，1,000,000,000 Wei 等于 1 Gwei。</p>
+<ol start="5">
+<li>燃气费在以太坊交易中的作用是什么？</li>
+</ol>
+<p>燃气费是执行以太坊网络上的交易和智能合约时产生的费用，确保其安全性和功能性。</p>
+<h3 id="dai-wei"><a class="header" href="#dai-wei">Dai Wei</a></h3>
+<p>戴伟是贝恩资本加密货币的研究合伙人，密码学家，加州大学圣地亚哥分校博士。 研究兴趣：密码协议的设计和分析，尤其是有关区块链及其应用程序的安全性，可扩展性和隐私性。</p>
+<p>戴伟是一位兴趣广泛的密码学专家，他在 1998 年发明了 B-money 匿名的、分布式的电子加密货币系统，强调点对点的交易和不可更改的交易记录。中本聪发明比特币的时候，借鉴了很多戴伟的设计，并和戴伟有很多邮件交流。</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../Web3/比特币.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../Web3/Solidity基础.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../Web3/比特币.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../Web3/Solidity基础.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>
